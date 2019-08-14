@@ -124,7 +124,9 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
             // if order created successfully
             $model->setStoreId(Mage::app()->getStore()->getId());
             if ($order = $model->createOrder()) {
-                $model->createInvoice();
+                if (Mage::getStoreConfig('external_api/sales/create_invoices')) {
+                    $model->createInvoice();
+                }
                 $this->getResponse()
                     ->setBody($order->getIncrementId());
 

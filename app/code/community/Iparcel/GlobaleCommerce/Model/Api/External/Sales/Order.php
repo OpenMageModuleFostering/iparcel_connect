@@ -433,7 +433,7 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
                 ),
                 'shipping_method' => $this->getCarrierCode() . '_auto',
                 'comment' => array(
-                    'customer_note' => 'This order has been programmatically created via I-Parcel extension'
+                    'customer_note' => "This order has been programmatically created via I-Parcel extension."
                 ),
                 'send_confirmation' => '0'
             ),
@@ -575,7 +575,14 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         $_order->save();
         $_order->sendNewOrderEmail();
 
-        $this->createShipment($_order);
+        if (Mage::getStoreConfig('external_api/sales/create_shipments')) {
+            $this->createShipment($_order);
+        } else {
+            // Add comment to order about tracking number
+            $_order->addStatusHistoryComment("UPS i-parcel Tracking Number: "
+                                             . $this->getTrackingNumber());
+            $_order->save();
+        }
 
         Mage::getSingleton('adminhtml/session_quote')->clear();
         Mage::unregister('rule_data');

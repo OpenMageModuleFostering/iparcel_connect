@@ -74,7 +74,7 @@ class Iparcel_All_Helper_Api
 
     /**
      * Finds the value of attribute matching the extension's configuration
-     * 
+     *
      * @param Mage_Catalog_Model_Product $product
      * @param string $code Attribute code
      * @return string
@@ -556,6 +556,12 @@ class Iparcel_All_Helper_Api
 
             // Detect and handle a Simple Product with Custom Options
             if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE && $product->getHasOptions()) {
+                if(get_class($product->getOptionInstance()) == 'MageWorx_CustomOptions_Model_Catalog_Product_Option') {
+                    if($this->_productHasDropdownOption($product)) {
+                        $items['SKUs'][] = $item;
+                    }
+                }
+
                 // loop through each of the sorted products with custom options
                 // and build out custom option and option type based skus
                 foreach ($this->_findSimpleProductVariants($product) as $customOptionProduct) {
@@ -577,13 +583,22 @@ class Iparcel_All_Helper_Api
                     $item['ProductName'] = $name . $customOptionName;
                     $items['SKUs'][] = $item;
                 }
+
             } else {
                 $items['SKUs'][] = $item;
             }
-
         }
 
         return $items;
+    }
+
+    protected function _productHasDropdownOption($product) {
+        foreach($product->getOptions() as $option) {
+            if($option->getType() == 'drop_down') {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -741,13 +756,19 @@ class Iparcel_All_Helper_Api
             $result[] = $allOptionals;
         }
 
+        // Make sure that the first element of the result array is an empty
+        // array. This will cause the "base" SKU to be sent as a catalog item.
+        if ($result[0] != array()) {
+            array_unshift($result, array());
+        }
+
         return $result;
     }
 
     /**
      * Accepts a Magento quote or order, then returns an address formatted for
      * the API
-     * 
+     *
      * @param object $object Object to extract address information from
      * @param bool $request If provided, this shipping rate request is used
      * @return array Address information formatted for API requests
@@ -825,12 +846,12 @@ class Iparcel_All_Helper_Api
         // Find the price of the product
         $itemPrice = (float) $item->getCalculationPrice();
         // if no price and item has parent (is configurable)
-        if (!$itemPrice && ($parent = $item->getParentItem())) {
+        if (is_null($itemPrice) && ($parent = $item->getParentItem())) {
             // get parent price
             $itemPrice = (float)$this->_getProductAttribute($parent->getProduct(), 'final_price') ?: (float)$this->_getProductAttribute($parent->getProduct(), 'price');
         }
         // if still no price
-        if (!$itemPrice) {
+        if (is_null($itemPrice)) {
             // get product price
             $itemPrice = (float)$this->_getProductAttribute($itemProduct, 'price');
         }

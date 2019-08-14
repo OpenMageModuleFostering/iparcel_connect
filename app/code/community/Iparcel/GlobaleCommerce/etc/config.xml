@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Iparcel_GlobaleCommerce>
-            <version>3.2.0</version>
+            <version>3.2.2</version>
         </Iparcel_GlobaleCommerce>
     </modules>
     <frontend>
@@ -191,12 +191,6 @@
             </ipglobalecommerce_read>
         </resources>
         <blocks>
-            <adminhtml>
-                <rewrite>
-                    <sales_order_shipment_view_form>Iparcel_GlobaleCommerce_Block_Adminhtml_Sales_Order_Shipment_View_Form</sales_order_shipment_view_form>
-                    <sales_order_shipment_view_tracking>Iparcel_GlobaleCommerce_Block_Adminhtml_Sales_Order_Shipment_View_Tracking</sales_order_shipment_view_tracking>
-                </rewrite>
-            </adminhtml>
             <ipglobalecommerce>
                 <class>Iparcel_GlobaleCommerce_Block</class>
             </ipglobalecommerce>
@@ -234,6 +228,8 @@
                 <enabled>1</enabled>
                 <transactional_emails>0</transactional_emails>
                 <order_status>complete</order_status>
+		<create_invoices>1</create_invoices>
+		<create_shipments>1</create_shipments>
             </sales>
         </external_api>
         <dev>
