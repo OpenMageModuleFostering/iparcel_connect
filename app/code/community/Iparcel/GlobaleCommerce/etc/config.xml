@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Iparcel_GlobaleCommerce>
-            <version>3.1.1</version>
+            <version>3.2.0</version>
         </Iparcel_GlobaleCommerce>
     </modules>
     <frontend>
@@ -57,9 +57,6 @@
                             <children>
                                 <config>
                                     <children>
-                                        <salesrules>
-                                            <title>i-parcel Sales Rules Synchronization</title>
-                                        </salesrules>
                                         <external_api>
                                             <title>i-parcel External API</title>
                                         </external_api>

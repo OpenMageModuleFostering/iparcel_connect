@@ -46,7 +46,7 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
     /**
      * Adding new order
      */
-    public function AddAction()
+    public function addAction()
     {
         // register global flag
         Mage::register('isExternalSale', true);
@@ -83,7 +83,6 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
                 Mage::throwException('There is no customer email address in your request');
             }
             $model->setCustomer($user, Mage::app()->getWebsite()->getId());
-
             // If this is a new address, or the user doesn't have a default address
             if ($user['address']['new'] == 1 || $model->getCustomerHasDefaultBilling() == false) {
                 $model->setCustomerBillingAddress($user['address']);
@@ -151,7 +150,7 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
     /**
      * Canceling an order
      */
-    public function CancelAction()
+    public function cancelAction()
     {
         try {
             $request = $this->_checkRequest();
@@ -200,7 +199,7 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
      * @param array $orders Array of orders from the request
      * @return array Updated $orders array
      */
-    private function _addCustomOptionsToOrder($orders)
+    protected function _addCustomOptionsToOrder($orders)
     {
         foreach($orders as &$order) {
             // Attempt to load the product by stripping out the Custom Options
@@ -244,7 +243,7 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
      * @param array $orders Array of orders from the request
      * @return array Updated $ordes array
      */
-    private function _convertOptions($orders)
+    protected function _convertOptions($orders)
     {
         foreach ($orders as &$order) {
             if (!array_key_exists('options', $order)) {

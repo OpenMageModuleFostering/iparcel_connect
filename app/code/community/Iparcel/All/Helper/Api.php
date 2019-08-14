@@ -55,20 +55,6 @@ class Iparcel_All_Helper_Api
     }
 
     /**
-     * Send REST XML requests
-     *
-     * Wrapper for _rest() that sends a SimpleXMLElement object to the API.
-     *
-     * @param SimpleXMLElement $xml XML to send
-     * @param string $url REST API URL to send POST data to
-     * @return string Response from the POST request
-     */
-    protected function _restXML($xml, $url)
-    {
-        return $this->_rest($xml->asXml, $url, array('Content-Type: text/xml'));
-    }
-
-    /**
      * Send REST JSON requests
      *
      * Wrapper for _rest() that sends the passed data as JSON to the API.
@@ -205,12 +191,17 @@ class Iparcel_All_Helper_Api
 
         $itemsList = array();
         foreach ($request->getAllItems() as $item) {
+            // Skip products that belong to a configurable -- we send the configurable product
+            if ($item->getParentItemId() !== null) {
+                continue;
+            }
+
             /**
              * @var Mage_Sales_Model_Quote_Item $item
              * @var Mage_Catalog_Model_Product $itemProduct
              */
             $itemProduct = Mage::getModel('catalog/product')->load($item->getProductId());
-            if ($item["is_virtual"] == false && !in_array($itemProduct->getTypeId(), array('configurable','downloadable'))) {
+            if ($item["is_virtual"] == false && $itemProduct->getTypeId() != 'downloadable') {
                 $itemDetails = $this->_getItemDetails($item);
                 $itemsList[] = $itemDetails;
             }
@@ -544,7 +535,18 @@ class Iparcel_All_Helper_Api
             $item['Length'] = (float)$this->_getProductAttribute($product, 'length');
             $item['Height'] = (float)$this->_getProductAttribute($product, 'height');
             $item['Width'] = (float)$this->_getProductAttribute($product, 'width');
-            $item['Weight'] = (float)$this->_getProductAttribute($product, 'weight');
+
+            /**
+             * On configurable products, send the weight if one is available,
+             * otherwise, send '0.1'. This allows for classification while the
+             * simple product is the one actually added to cart and sold.
+             */
+            $productWeight = (float)$this->_getProductAttribute($product, 'weight');
+            if ($product->getTypeId() == Mage_Catalog_Model_Product_TYPE::TYPE_CONFIGURABLE
+            && $productWeight < 0.1) {
+                $productWeight = 0.1;
+            }
+            $item['Weight'] = $productWeight;
 
             $item['ProductURL'] = $product->getUrlPath();
             $item['SKN'] = '';
@@ -590,7 +592,7 @@ class Iparcel_All_Helper_Api
      * @param Mage_Catalog_Model_Product $product Product with Options
      * @return array Options array with all product variations
      */
-    private function _findSimpleProductVariants($product)
+    protected function _findSimpleProductVariants($product)
     {
         // get product options collection object
         $options = Mage::getModel('catalog/product_option')
@@ -682,7 +684,7 @@ class Iparcel_All_Helper_Api
      * @param array $options Array of option arrays (sku, price, title, sort_order, required)
      * @return array Array of arrays, representing the possible option variations
      */
-    private function _findVariations($options)
+    protected function _findVariations($options)
     {
         // filter out empty values
         $options = array_filter($options);
@@ -750,7 +752,7 @@ class Iparcel_All_Helper_Api
      * @param bool $request If provided, this shipping rate request is used
      * @return array Address information formatted for API requests
      */
-    private function _prepareAddress($object, $request = false)
+    protected function _prepareAddress($object, $request = false)
     {
         /**
          * @var Mage_Sales_Model_Quote_Address $shippingAddress
@@ -785,7 +787,7 @@ class Iparcel_All_Helper_Api
      * @param object|bool $request If provided, this shipping rate request is used
      * @return array Formatted address array
      */
-    private function _getAddressArray($address, $emailAddress, $request = false)
+    protected function _getAddressArray($address, $emailAddress, $request = false)
     {
         $formattedAddress = array();
         $formattedAddress['City'] = $request ? $request->getDestCity() : $address->getCity();
@@ -821,7 +823,7 @@ class Iparcel_All_Helper_Api
         }
 
         // Find the price of the product
-        $itemPrice = (float)$this->_getProductAttribute($itemProduct, 'final_price') ?: (float)$this->_getProductAttribute($itemProduct, 'price');
+        $itemPrice = (float) $item->getCalculationPrice();
         // if no price and item has parent (is configurable)
         if (!$itemPrice && ($parent = $item->getParentItem())) {
             // get parent price

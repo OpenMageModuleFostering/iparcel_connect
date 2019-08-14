@@ -30,10 +30,16 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         if (!$data) {
             Mage::throwException('Session data not specified');
         }
-        if (empty($data['customer_id'])) {
+        if (empty($data['customer_id']) && $this->isGuestUser() == false) {
             Mage::throwException('Customer ID not specified');
         }
-        Mage::getSingleton('adminhtml/session_quote')->setCustomerId((int) $data['customer_id']);
+
+        if ($this->isGuestUser()) {
+            Mage::getSingleton('adminhtml/session_quote')->getQuote()->setCustomerIsGuest(true);
+            Mage::getSingleton('adminhtml/session_quote')->setCustomerId(0);
+        } else {
+            Mage::getSingleton('adminhtml/session_quote')->setCustomerId((int) $data['customer_id']);
+        }
         return $this;
     }
 
@@ -72,6 +78,84 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
     }
 
     /**
+     * Determines if guest checkouts are allowed for this store
+     *
+     * @return bool
+     */
+    protected function _isGuestCheckoutAllowed() {
+        $guestCheckoutAllowed = Mage::getStoreConfig('checkout/options/guest_checkout');
+        return (bool) $guestCheckoutAllowed;
+    }
+
+    /**
+     * @param $user
+     */
+    protected function _setGuestCustomer($user) {
+        $customer = new Varien_Object();
+        $customer->setEmail($user['email']);
+        $customer->setFirstname($user['firstname']);
+        $customer->setLastname($user['lastname']);
+        $customer->setIsGuest(true);
+        return parent::setCustomer($customer);
+    }
+
+    /**
+     * Creates a new customer for the order
+     *
+     * @param $user
+     * @param $websiteId
+     */
+    private function _setNewCustomer($user, $websiteId) {
+        $customer = Mage::getModel('customer/customer');
+        /* var $customer Mage_Customer_Model_Customer */
+        if ($websiteId) {
+            $customer->setWebsiteId($websiteId);
+        }
+
+        $customer->setEmail($user['email']);
+        $customer->setFirstname($user['firstname']);
+        $customer->setLastname($user['lastname']);
+        $customer->setPassword($user['password']);
+        $customer->setConfirmation(null);
+        $customer->save();
+        return parent::setCustomer($customer);
+    }
+
+    /**
+     * Checks if a given email address belongs to an existing customer
+     *
+     * @param string $emailAddress
+     * @param int $websiteId
+     * @return mixed
+     */
+    private function _doesCustomerExist($emailAddress, $websiteId)
+    {
+        $customer = Mage::getModel('customer/customer');
+
+        $customer->setWebsiteId($websiteId);
+        $customer->loadByEmail($emailAddress);
+
+        if ($customer->getId()) {
+            return $customer;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the order is placed by a guest user
+     *
+     * @return bool
+     */
+    public function isGuestUser()
+    {
+        if($this->getCustomer() && $this->getCustomer()->getIsGuest()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Customer setter
      *
      * @param array $user, int $websiteId
@@ -79,28 +163,71 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
      */
     public function setCustomer($user, $websiteId)
     {
-        $customer = Mage::getModel('customer/customer');
-        /* var $customer Mage_Customer_Model_Customer */
-        if ($websiteId) {
-            $customer->setWebsiteId($websiteId);
-        }
-        $customer->loadByEmail($user['email']);
-        // if customer exists set existing
-        if ($customer->getId()) {
+        /**
+         * 1. Check if the user already exists. Use it if so.
+         * 2. Check if the store allows guest checkouts. Checkout as guest if so
+         * 3. If 1 and 2 fail, create a new customer for this order
+         */
+        $customer = $this->_doesCustomerExist($user['email'], $websiteId);
+        if ($customer) {
             parent::setCustomer($customer);
+        } elseif ($this->_isGuestCheckoutAllowed()) {
+            $this->_setGuestCustomer($user);
         } else {
-            $customer->setEmail($user['email']);
-            $customer->setFirstname($user['firstname']);
-            $customer->setLastname($user['lastname']);
-            $customer->setPassword($user['password']);
-            $customer->setConfirmation(null);
-            $customer->save();
-            // else create new one
-            parent::setCustomer($customer);
+            $this->_setNewCustomer($user, $websiteId);
         }
-        // set customer email and return
+
         $this->setCustomerEmail($user['email']);
         return $this;
+    }
+
+    /**
+     * Looks up the customer's address and returns it, or creates a new address.
+     *
+     * @param array $addressData
+     * @return mixed
+     */
+    private function getOrCreateAddress($addressData)
+    {
+        $customer = $this->getCustomer();
+        $region = Mage::getModel('directory/region')->loadByCode($addressData['region_id'], $addressData['country_id']);
+
+        if (!$this->getIsGuestUser() && $customer instanceof Mage_Customer_Model_Customer) {
+            /**
+             * Attempt to lookup an already existing address that matches the
+             * $addressData passed into this method
+             */
+            $addressCollection = $customer->getAddressCollection()
+                ->addAttributeToFilter('firstname', $addressData['firstname'])
+                ->addAttributeToFilter('lastname', $addressData['lastname'])
+                ->addAttributeToFilter('country_id', $addressData['country_id'])
+                ->addAttributeToFilter('street', $addressData['street'])
+                ->addAttributeToFilter('postcode', $addressData['postcode'])
+                ->addAttributeToFilter('city', $addressData['city'])
+                ->addAttributeToFilter('telephone', $addressData['telephone'])
+                ->addAttributeToFilter('region_id', $region->getId());
+
+            if (count($addressCollection) > 0) {
+                $address = $addressCollection->getFirstItem();
+            } else {
+                $address = Mage::getModel('customer/address');
+            }
+        } else {
+            $address = new Varien_Object();
+        }
+
+        $address->setCustomerId($customer->getId());
+        $address->setFirstname($addressData['firstname']);
+        $address->setLastname($addressData['lastname']);
+        $address->setCountryId($addressData['country_id']);
+        $address->setStreet($addressData['street']);
+        $address->setPostcode($addressData['postcode']);
+        $address->setCity($addressData['city']);
+        $address->setTelephone(isset($addressData['telephone']) ? $addressData['telephone'] : '');
+        $address->setRegion(isset($addressData['region_id']) ? $addressData['region_id'] : '');
+        $address->setRegionId($region->getId());
+
+        return $address;
     }
 
     /**
@@ -111,26 +238,11 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
      */
     public function setCustomerBillingAddress($_address)
     {
-        $address = Mage::getModel('customer/address');
-        /* var $address Mage_Customer_Model_Address */
-        $customer = $this->getCustomer();
-        /* var $customer Mage_Customer_Model_Customer */
-        // throw exception if customer is not specified
-        if (!$customer) {
-            Mage::throwException('Customer not specified');
+        $address = $this->getOrCreateAddress($_address);
+        if(!$this->isGuestUser()) {
+            $address->save();
         }
-        $region = Mage::getModel('directory/region')->loadByCode($_address['region_id'], $_address['country_id']);
-        $address->setCustomerId($customer->getId());
-        $address->setFirstname($_address['firstname']);
-        $address->setLastname($_address['lastname']);
-        $address->setCountryId($_address['country_id']);
-        $address->setStreet($_address['street']);
-        $address->setPostcode($_address['postcode']);
-        $address->setCity($_address['city']);
-        $address->setTelephone(isset($_address['telephone']) ? $_address['telephone'] : '');
-        $address->setRegion(isset($_address['region_id']) ? $_address['region_id'] : '');
-        $address->setRegionId($region->getId());
-        $address->save();
+
         return parent::setCustomerBillingAddress($address);
     }
 
@@ -147,7 +259,7 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
             Mage::throwException('Customer is not specified');
         }
 
-    /* if no default billing do nothing */
+        /* if no default billing do nothing */
         if (!$customer->getDefaultBilling()) {
             return $this;
         }
@@ -176,26 +288,11 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
      */
     public function setCustomerShippingAddress($_address)
     {
-        $address = Mage::getModel('customer/address');
-        /* var $address Mage_Customer_Model_Address */
-        $customer = $this->getCustomer();
-        /* var $customer Mage_Customer_Model_Customer */
-        // throw exception if customer is not specified
-        if (!$customer) {
-            Mage::throwException('Customer not specified');
+        $address = $this->getOrCreateAddress($_address);
+        if(!$this->isGuestUser()) {
+            $address->save();
         }
-        $region = Mage::getModel('directory/region')->loadByCode($_address['region_id'], $_address['country_id']);
-        $address->setCustomerId($customer->getId());
-        $address->setFirstname($_address['firstname']);
-        $address->setLastname($_address['lastname']);
-        $address->setCountryId($_address['country_id']);
-        $address->setStreet($_address['street']);
-        $address->setPostcode($_address['postcode']);
-        $address->setCity($_address['city']);
-        $address->setTelephone(isset($_address['telephone']) ? $_address['telephone'] : '');
-        $address->setRegion(isset($_address['region_id']) ? $_address['region_id'] : '');
-        $address->setRegionId($region->getId());
-        $address->save();
+
         return parent::setCustomerShippingAddress($address);
     }
 
@@ -276,6 +373,7 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         // set products and options
         $this->setProducts($_products);
         $this->setOptions($_options);
+        $paymentMethodCode = Mage::getModel('iparcel/payment_iparcel')->getCode();
 
         $_customerBillingAddress = $this->getCustomerBillingAddress();
         /* var $_customerBillingAddress Mage_Customer_Model_Address */
@@ -286,10 +384,11 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         $_orderData = array(
             'session' => array(
                 'customer_id' => $_customer->getId(),
-                'store_id' => $this->getStoreId()
+                'store_id' => $this->getStoreId(),
+                'is_guest' => $_customer->getIsGuest()
             ),
             'payment' => array(
-                'method' => 'iparcel'
+                'method' => $paymentMethodCode
             ),
             'add_products' => $_products,
             'order' => array(
@@ -339,6 +438,20 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
                 'send_confirmation' => '0'
             ),
         );
+
+        /**
+         * Place the user in the "NOT LOGGED IN GROUP" if they are a guest,
+         * and set the quote's first/lastname
+         */
+        if ($this->isGuestUser()) {
+            $_orderData['order']['account']['group_id'] = 0;
+            $_orderData['session']['customer_id'] = 0;
+            Mage::getSingleton('adminhtml/session_quote')
+                ->getQuote()
+                ->setCustomerFirstname($_customer->getFirstname())
+                ->setCustomerLastname($_customer->getLastname());
+        }
+
         return parent::setOrderData($_orderData);
     }
 
@@ -495,8 +608,10 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
             ->addObject($invoice->getOrder());
         /* var $transactionSave Mage_Core_Model_Resource_Transaction */
         $transactionSave->save();
-        $invoice->sendEmail();
+        $invoice->capture();
+        $invoice->save();
         $this->setInvoice($invoice);
+        $order->save();
         return $invoice;
     }
 
