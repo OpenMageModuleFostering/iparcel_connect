@@ -36,9 +36,10 @@ class Iparcel_GlobaleCommerce_DevController extends Mage_Core_Controller_Front_A
         foreach ($_regionCollection as $_region) {
             $response[$_region->getCode()] = $_region->getDefaultName();
         }
+
         $this->getResponse()
-            ->setHeader('Content-Type', 'application/json');
-        echo json_encode($response);
+            ->setHeader('Content-Type', 'application/json')
+            ->setBody(json_encode($response));
     }
 
     /**
@@ -76,9 +77,12 @@ class Iparcel_GlobaleCommerce_DevController extends Mage_Core_Controller_Front_A
                     'created_at' => $_order->getCreatedAt()
                 );
             }
-            echo json_encode($response);
+
+            $this->getResponse()
+                ->setBody(json_encode($response));
         } catch (Mage_Core_Exception $e) {
-            echo $e->getMessage();
+            $this->getResponse()
+                ->setBody($e->getMessage());
         }
     }
 }

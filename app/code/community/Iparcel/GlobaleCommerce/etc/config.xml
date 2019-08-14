@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Iparcel_GlobaleCommerce>
-            <version>3.1.0</version>
+            <version>3.1.1</version>
         </Iparcel_GlobaleCommerce>
     </modules>
     <frontend>
@@ -101,6 +101,11 @@
                     </parcel>
                 </entities>
             </ipglobalecommerce_resource>
+            <sales>
+                <rewrite>
+                    <order>Iparcel_GlobaleCommerce_Model_Sales_Order</order>
+                </rewrite>
+            </sales>
         </models>
         <events>
             <sales_order_load_after>
@@ -166,42 +171,6 @@
                     </iparcel_sales_quote_save_before_observer>
                 </observers>
             </sales_quote_save_before>
-            <model_load_before>
-                <observers>
-                    <iparcel_model_load_before_observer>
-                        <type>singleton</type>
-                        <class>Iparcel_GlobaleCommerce_Model_Observer</class>
-                        <method>createCheckState</method>
-                    </iparcel_model_load_before_observer>
-                </observers>
-            </model_load_before>
-            <adminhtml_cache_refresh_type>
-                <observers>
-                    <iparcel_adminhtml_cache_refresh_type_observer>
-                        <type>singleton</type>
-                        <class>Iparcel_GlobaleCommerce_Model_Observer</class>
-                        <method>removeExtendFile</method>
-                    </iparcel_adminhtml_cache_refresh_type_observer>
-                </observers>
-            </adminhtml_cache_refresh_type>
-            <adminhtml_cache_flush_all>
-                <observers>
-                    <iparcel_adminhtml_cache_flush_all_observer>
-                        <type>singleton</type>
-                        <class>Iparcel_GlobaleCommerce_Model_Observer</class>
-                        <method>removeExtendFile</method>
-                    </iparcel_adminhtml_cache_flush_all_observer>
-                </observers>
-            </adminhtml_cache_flush_all>
-            <adminhtml_cache_flush_system>
-                <observers>
-                    <iparcel_adminhtml_cache_flush_system_observer>
-                        <type>singleton</type>
-                        <class>Iparcel_GlobaleCommerce_Model_Observer</class>
-                        <method>removeExtendFile</method>
-                    </iparcel_adminhtml_cache_flush_system_observer>
-                </observers>
-            </adminhtml_cache_flush_system>
         </events>
         <resources>
             <ipglobalecommerce_setup>

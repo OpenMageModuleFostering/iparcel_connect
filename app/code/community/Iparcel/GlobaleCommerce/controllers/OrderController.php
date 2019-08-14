@@ -40,10 +40,6 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
         if (strcasecmp($request->getPost('key'), Mage::helper('ipglobalecommerce')->getGuid())) {
             Mage::throwException('Wrong GUID key');
         }
-        // checking if request IP is allowed
-        if (!Mage::helper('ipglobalecommerce/api_external')->isAllowed()) {
-            Mage::throwException('Access Forbidden');
-        }
         return $request;
     }
 
@@ -76,7 +72,8 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
             // Make sure that an order doesn't already exist for this request
             $model->loadByTrackingNumber($tracking['number']);
             if ($model->getId()) {
-                echo $model->getOrderIncrementId();
+                $this->getResponse()
+                    ->setBody($model->getOrderIncrementId());
                 return true;
             }
 
@@ -128,8 +125,10 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
             // if order created successfully
             $model->setStoreId(Mage::app()->getStore()->getId());
             if ($order = $model->createOrder()) {
-                $invoice = $model->createInvoice();
-                echo $order->getIncrementId();
+                $model->createInvoice();
+                $this->getResponse()
+                    ->setBody($order->getIncrementId());
+
                 $model->setOrderIncrementId($order->getIncrementId());
                 $model->save();
             }
@@ -160,12 +159,14 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
             // var $order Mage_Sales_Model_Order
             if ($order->getId()) {
                 $order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true)->save();
-                echo 'Order #'.$request->getPost('order').' cancelled.';
+                $this->getResponse()
+                    ->setBody('Order #'.$request->getPost('order').' cancelled.');
             } else {
                 Mage::throwException('Order no longer exists');
             }
         } catch (Mage_Core_Exception $e) {
-            echo $e->getMessage();
+            $this->getResponse()
+                ->setBody($e->getMessage());
         }
     }
 

@@ -33,8 +33,10 @@ class Iparcel_All_Model_Observer
                 return;
             }
 
+            $iparcelCarrierCode = Mage::getModel('iparcel/payment_iparcel')->getCode();
+
             $order = $observer->getShipment()->getOrder();
-            if ($order->getShippingCarrier() && $order->getShippingCarrier()->getCarrierCode() == 'iparcel') {
+            if ($order->getShippingCarrier() && $order->getShippingCarrier()->getCarrierCode() == $iparcelCarrierCode) {
                 $api = Mage::helper('iparcel/api');
                 $response = $api->submitParcel($shipment);
 
@@ -74,8 +76,11 @@ class Iparcel_All_Model_Observer
         if (!$order->getQuote()) {
             return;
         }
+        
+        $iparcelCarrierCode = Mage::getModel('iparcel/payment_iparcel')->getCode();
+
         // if it's i-parcel shipping method
-        if ($order->getShippingCarrier() && $order->getShippingCarrier()->getCarrierCode() != 'iparcel') {
+        if ($order->getShippingCarrier() && $order->getShippingCarrier()->getCarrierCode() != $iparcelCarrierCode) {
             return;
         }
 
@@ -189,8 +194,9 @@ class Iparcel_All_Model_Observer
                 $iparcelDuty = $shippingAddress->getIparcelDutyAmount();
             } else {
                 $carrier = $cart->getSalesEntity()->getShippingCarrier();
+                $iparcelCarrierCode = Mage::getModel('iparcel/payment_iparcel')->getCode();
 
-                if (is_object($carrier) && $carrier->getCarrierCode() == 'iparcel') {
+                if (is_object($carrier) && $carrier->getCarrierCode() == $iparcelCarrierCode) {
                     $iparcelTax = $cart->getSalesEntity()->getIparcelTaxAmount();
                     $iparcelDuty = $cart->getSalesEntity()->getIparcelDutyAmount();
                 }

@@ -6,47 +6,11 @@
  * @package     Iparcel_GlobaleCommerce
  * @author      Bobby Burden <bburden@i-parcel.com>
  */
-class Iparcel_GlobaleCommerce_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier_Abstract implements Mage_Shipping_Model_Carrier_Interface
+class Iparcel_GlobaleCommerce_Model_Carrier_Iparcel extends Iparcel_All_Model_Carrier_Abstract implements Mage_Shipping_Model_Carrier_Interface
 {
     protected $_code = 'i-parcel-globalecommerce';
     protected $_carrier = 'i-parcel-globalecommerce';
     protected $_isFixed = true;
-    protected $_trackingUrl = 'https://tracking.i-parcel.com/secure/track.aspx?track=';
-
-    /**
-     * Check if carrier has shipping label option available
-     *
-     * @return bool
-     */
-    public function isShippingLabelsAvailable()
-    {
-        return true;
-    }
-
-    /**
-     * Check if carrier has shipping tracking option available
-     *
-     * @return bool
-     */
-    public function isTrackingAvailable()
-    {
-        return true;
-    }
-
-    /**
-     * Get info for track order page
-     *
-     * @param string $number
-     * @return Varien_Object
-     */
-    public function getTrackingInfo($number)
-    {
-        return new Varien_Object(array(
-            'tracking' => $number,
-            'carrier_title' => $this->_carrier,
-            'url' => $this->_trackingUrl.$number
-        ));
-    }
 
     /**
      * Do request to shipment
