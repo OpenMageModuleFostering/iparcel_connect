@@ -202,7 +202,7 @@ class Iparcel_Shipping_Helper_Api
 
             $item['Height'] = (float)$product->getHeight();
             $item['Length'] = (float)$product->getLength();
-            $item['ProductURL'] = $product->getUrlPath();
+            $item['ProductURL'] = $product->getProductUrl();
             $item['SKN'] = '';
             if ($code = $shipAlone->getAttributeCode()) {
                 $item['ShipAlone'] = $product->getAttributeText($code) == 'Yes' ? true : false;
