@@ -19,11 +19,11 @@ var iparcelPost = {
             $sku.css("display","none");
             $sku.attr("class","iparcelsku");
             $sku.text(sku);
-            $jip('.add-to-cart').append($sku);
+            $jip('form#product_addtocart_form').append($sku);
             var $options = $jip("<div/>");
             $options.css("display","none");
             $options.attr("class","iparceloptions");
-            $jip('.add-to-cart').append($options);
+            $jip('form#product_addtocart_form').append($options);
             $jip('.super-attribute-select').change(function(){
                 iparcelPost.setStock('false');
                 iparcelPost.updateSelect();
@@ -86,7 +86,7 @@ var iparcelPost = {
             $stock.css("display","none");
             $stock.attr("class","iparcelstock");
             $stock.text(qty > 0 ? 'true' : 'false');
-            $jip('.add-to-cart').append($stock);
+            $jip('form#product_addtocart_form').append($stock);
         });
     },
     setStock: function(value){
