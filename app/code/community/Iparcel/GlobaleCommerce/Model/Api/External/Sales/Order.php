@@ -241,6 +241,9 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
                 ->addAttributeToFilter('sku', $product['sku'])
                 ->addAttributeToSelect('*')
                 ->getFirstItem();
+            if(!$_product || !$_product->getData()) {
+                Mage::throwException("Product SKU not found: \"" . $product['sku'] . "\"");
+            }
             /* var $_product Mage_Catalog_Model_Product */
             $_product->load($_product->getId());
             $_products[$_product->getId()] = array(

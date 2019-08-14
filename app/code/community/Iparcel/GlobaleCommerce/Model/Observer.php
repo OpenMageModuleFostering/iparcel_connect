@@ -54,14 +54,13 @@ class Iparcel_GlobaleCommerce_Model_Observer
             if (!$cacheStatus || !file_exists($this->_filePath)) {
                 file_put_contents($this->_filePath, $dynamicOrderString);
             }
-            include $this->_filePath;
 
-            //to avoid file content is changed by anyone
             $fileContent = file_get_contents($this->_filePath);
             if ($fileContent != $dynamicOrderString) {
                 file_put_contents($this->_filePath, $dynamicOrderString);
-                include $this->_filePath;
             }
+
+            include $this->_filePath;
 
             Mage::getConfig()->setNode('global/models/sales/rewrite/order', $iparcelOrderClass);
             $this->_eventFlag = false;

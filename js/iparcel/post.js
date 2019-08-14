@@ -13,7 +13,7 @@ var iparcelPost = {
         if (url.indexOf(':') == 0) {
             url = url.substring(1,url.length);
         }
-        this.url = url+'shippingip/ajax/configurable';
+        this.url = url+'iparcel/ajax/configurable';
         $jip(document).ready(function(){
             var $sku = $jip("<div/>");
             $sku.css("display","none");
@@ -147,7 +147,10 @@ var iparcelPost = {
         });
     },
     append: function(item,name){
-        $jip('.item .product-name a:contains('+name+')').closest('.item').append(item);
+        var $item = $jip('.item .product-name a').filter(function () {
+            return $jip(this).text() == name;
+        });
+        $item.closest('.item').append(item);
     }
 };
 

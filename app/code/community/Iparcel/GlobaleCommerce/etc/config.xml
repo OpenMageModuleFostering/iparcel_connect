@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Iparcel_GlobaleCommerce>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </Iparcel_GlobaleCommerce>
     </modules>
     <frontend>
@@ -231,11 +231,6 @@
                     <sales_order_shipment_view_tracking>Iparcel_GlobaleCommerce_Block_Adminhtml_Sales_Order_Shipment_View_Tracking</sales_order_shipment_view_tracking>
                 </rewrite>
             </adminhtml>
-            <catalog>
-                <rewrite>
-                    <product_list>Iparcel_GlobaleCommerce_Block_Catalog_Product_List</product_list>
-                </rewrite>
-            </catalog>
             <ipglobalecommerce>
                 <class>Iparcel_GlobaleCommerce_Block</class>
             </ipglobalecommerce>

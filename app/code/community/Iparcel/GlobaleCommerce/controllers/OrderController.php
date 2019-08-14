@@ -134,7 +134,18 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
                 $model->save();
             }
         } catch (Mage_Core_Exception $e) {
-            echo $e->getMessage();
+            /** @var Iparcel_All_Model_Log $log */
+            $log = Mage::getModel('iparcel/log');
+            $log->setRequest($this->_checkRequest())
+                ->setResponse($e->getMessage())
+                ->setController('Add Order')
+                ->save();
+
+            $this->getResponse()->setHeader('Content-Type', '', true)
+                ->setHttpResponseCode(500)
+                ->setBody($e->getMessage())
+                ->sendResponse();
+            return;
         }
     }
 
