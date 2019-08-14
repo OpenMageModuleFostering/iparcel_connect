@@ -6,7 +6,7 @@
  * @package         Iparcel_Shipping
  * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
  */
-class Iparcel_Shipping_Adminhtml_Sync_AjaxController extends Mage_Adminhtml_Controller_Action
+class Iparcel_Shipping_Adminhtml_Shippingip_Sync_AjaxController extends Mage_Adminhtml_Controller_Action
 {
     /**
      * Preparing handles for controller
@@ -19,7 +19,7 @@ class Iparcel_Shipping_Adminhtml_Sync_AjaxController extends Mage_Adminhtml_Cont
         $update = $this->getLayout()->getUpdate();
         /* @var $update Mage_Core_Model_Layout_Update */
         $update->resetHandles();
-        $update->addHandle('shippingip_sync_ajax');
+        $update->addHandle('adminhtml_shippingip_sync_ajax');
         foreach ($handles as $handle) {
             if (is_string($handle)) {
                 $update->addHandle($handle);
@@ -151,7 +151,7 @@ class Iparcel_Shipping_Adminhtml_Sync_AjaxController extends Mage_Adminhtml_Cont
             }
         } else {
             // show layout if not
-            $this->_setupHandles(array('shippingip_sync_ajax_catalog'))
+            $this->_setupHandles(array('adminhtml_shippingip_sync_ajax_catalog'))
                 ->renderLayout();
         }
     }
@@ -174,7 +174,7 @@ class Iparcel_Shipping_Adminhtml_Sync_AjaxController extends Mage_Adminhtml_Cont
             }
         } else {
             // show layout if not
-            $this->_setupHandles(array('shippingip_sync_ajax_checkitems'))
+            $this->_setupHandles(array('adminhtml_shippingip_sync_ajax_checkitems'))
                 ->renderLayout();
         }
     }

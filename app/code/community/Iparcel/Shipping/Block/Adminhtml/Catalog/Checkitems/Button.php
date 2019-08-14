@@ -17,7 +17,7 @@ class Iparcel_Shipping_Block_Adminhtml_Catalog_Checkitems_Button extends Mage_Ad
      */
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
-        $url = Mage::helper('adminhtml')->getUrl("shippingip/sync_ajax/checkitems");
+        $url = Mage::helper('adminhtml')->getUrl("adminhtml/shippingip_sync_ajax/checkitems");
         
         $html = $this->getLayout()->createBlock('adminhtml/widget_button')
                     ->setType('button')

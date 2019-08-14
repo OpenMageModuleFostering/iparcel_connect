@@ -17,5 +17,5 @@
 <p>There was <span>0</span> errors when uploading catalog</p>
 </div>
 <script type="text/javascript">
-var sync = new iparcelSync.sync('<?php echo Mage::helper('adminhtml')->getUrl('shippingip/sync_ajax/catalog') ?>?isAjax=true', <?php echo Mage::getStoreConfig('catalog_mapping/upload/step'); ?>);
+var sync = new iparcelSync.sync('<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/shippingip_sync_ajax/catalog') ?>?isAjax=true', <?php echo Mage::getStoreConfig('catalog_mapping/upload/step'); ?>);
 </script>

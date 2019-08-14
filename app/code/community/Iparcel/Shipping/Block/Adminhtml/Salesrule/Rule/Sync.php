@@ -17,7 +17,7 @@ class Iparcel_Shipping_Block_Adminhtml_Salesrule_Rule_Sync extends Mage_Adminhtm
      */
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
-        $url = Mage::helper('adminhtml')->getUrl("shippingip/sync/salesrule");
+        $url = Mage::helper('adminhtml')->getUrl("adminhtml/shippingip_sync/salesrule");
         
         $html = $this->getLayout()->createBlock('adminhtml/widget_button')
                     ->setType('button')

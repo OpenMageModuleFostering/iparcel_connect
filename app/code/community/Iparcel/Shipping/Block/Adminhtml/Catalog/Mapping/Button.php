@@ -17,7 +17,7 @@ class Iparcel_Shipping_Block_Adminhtml_Catalog_Mapping_Button extends Mage_Admin
      */
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
-        $url = Mage::helper('adminhtml')->getUrl("shippingip/sync_ajax/catalog");
+        $url = Mage::helper('adminhtml')->getUrl("adminhtml/shippingip_sync_ajax/catalog");
         
         $html = $this->getLayout()->createBlock('adminhtml/widget_button')
                     ->setType('button')

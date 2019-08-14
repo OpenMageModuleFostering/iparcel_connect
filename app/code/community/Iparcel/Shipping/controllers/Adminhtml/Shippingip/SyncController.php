@@ -6,7 +6,7 @@
  * @package         Iparcel_Shipping
  * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
  */
-class Iparcel_Shipping_Adminhtml_SyncController extends Mage_Adminhtml_Controller_Action
+class Iparcel_Shipping_Adminhtml_Shippingip_SyncController extends Mage_Adminhtml_Controller_Action
 {
     public function salesruleAction()
     {
