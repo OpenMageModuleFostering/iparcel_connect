@@ -20,19 +20,41 @@ var iparcelPost = {
             $sku.attr("class","iparcelsku");
             $sku.text(sku);
             $jip('form#product_addtocart_form').append($sku);
+
             var $options = $jip("<div/>");
             $options.css("display","none");
             $options.attr("class","iparceloptions");
             $jip('form#product_addtocart_form').append($options);
+
             $jip('.super-attribute-select').change(function(){
-                iparcelPost.setStock('false');
                 iparcelPost.updateSelect();
             });
+
+            // if there are '.super-attribute-select' elements, find the SKU
+            // for the default configuration
+            if ($jip('.super-attribute-select.required-entry').length > 0) {
+                $jip('.super-attribute-select.required-entry').each(function() {
+                    this.validOptions = [];
+
+                    var self = this;
+                    $jip(this).children().each(function(){
+                        if ($jip(this).val() != '') {
+                            self.validOptions.push($jip(this).val());
+                        }
+                    });
+
+                    if (this.validOptions.length == 1) {
+                        // Only one valid option for this required select
+                        $jip(this).val(this.validOptions[0]);
+                    }
+                });
+                iparcelPost.updateSelect();
+            }
             // Watch for custom option text fields, areas
             $jip(iparcelPost.textSelectors).change(function() {
-                iparcelPost.setStock('false');
                 iparcelPost.updateTextfields();
             });
+
             var $iterator = 0;
             $jip(document).bind('DOMNodeInserted', function(e){
                 if ($jip(e.target).attr('class') == 'swatch-link'){
@@ -47,6 +69,7 @@ var iparcelPost = {
                     }
                 }
             });
+
             $jip('.swatch-link').click(iparcelPost.update);
         });
     },
@@ -64,15 +87,17 @@ var iparcelPost = {
         iparcelMage.ajax.post(iparcelPost.sku,super_attribute,iparcelPost.url);
     },
     updateSelect: function () {
+        iparcelPost.setStock('false');
         var $this = $jip(this);
         var super_attribute = '';
         $jip('.super-attribute-select, .product-custom-option').each(function () {
-                var $this = $jip(this);
-                super_attribute += $this.attr('name') + '=' + $this.val() + '&';
+            var $this = $jip(this);
+            super_attribute += $this.attr('name') + '=' + $this.val() + '&';
         });
         iparcelMage.ajax.post(iparcelPost.sku, super_attribute, iparcelPost.url);
     },
     updateTextfields: function() {
+        iparcelPost.setStock('false');
         var custom_options = '';
         $jip(iparcelPost.textSelectors).each(function() {
             var $this = $jip(this);

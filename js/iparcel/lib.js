@@ -8,6 +8,7 @@ var iparcelMage = {
 		post: function(sku, super_attribute, url) {
 			var $jip = jQuery.noConflict();
 			var data = super_attribute+'sku='+sku;
+            $jip('.iparcelsku').attr('finalsku', 'false');
 			$jip.ajax({
 				'url': url,
 				'data': data,
@@ -16,6 +17,7 @@ var iparcelMage = {
 				success: function(data){
 					if (data){
 						$jip('.iparcelsku').text(data.sku);
+                        $jip('.iparcelsku').attr('finalsku', 'true');
 
 						iparcelPost.setStock('true');
 

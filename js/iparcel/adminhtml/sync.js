@@ -1,3 +1,10 @@
+/**
+ * js lib for i-parcel's ajax sync
+ *
+ * @category	Iparcel
+ * @package		Iparcel_All
+ * @author		Bobby Burden <bburden@i-parcel.com>
+ */
 var iparcelSync = {
 	item: null,
 	sync: null,

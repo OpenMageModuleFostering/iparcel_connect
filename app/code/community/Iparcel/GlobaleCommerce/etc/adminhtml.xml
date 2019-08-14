@@ -1,0 +1,14 @@
+<config>
+    <menu>
+        <iparcel>
+            <title>i-parcel</title>
+            <children>
+                <external_api translate="title" module="ipglobalecommerce">
+                    <title>External API</title>
+                    <sort_order>15</sort_order>
+                    <action>adminhtml/system_config/edit/section/external_api</action>
+                </external_api>
+            </children>
+        </iparcel>
+    </menu>
+</config>

@@ -1,38 +1,7 @@
 <layout>
-	<adminhtml_sales_order_shipment_view>
-		<reference name="head">
-			<action method="addJs"><script>iparcel/adminhtml/label.js</script></action>
-		</reference>
-	</adminhtml_sales_order_shipment_view>
-	<adminhtml_shippingip_sync_ajax>
-		<block type="adminhtml/page" name="root" output="toHtml" template="page.phtml">
-			<block type="adminhtml/page_head" name="head" as="head" template="page/head.phtml">
-				<action method="addJs"><script>iparcel/jQuery.js</script></action>
-				<action method="addJs"><script>iparcel/adminhtml/sync.js</script></action>
-				<action method="addCss"><stylesheet>iparcel/ajaxSync.css</stylesheet></action>
-			</block>
-			<block type="core/text_list" name="content" as="content" />
-		</block>
-	</adminhtml_shippingip_sync_ajax>
-	<adminhtml_shippingip_sync_ajax_catalog>
-		<reference name="head">
-			<action method="setTitle"><title>i-parcel Catalog Upload</title></action>
-		</reference>
-		<reference name="content">
-			<block type="core/template" name="catalog.sync" template="iparcel/sync/ajax/catalog.phtml"/>
-		</reference>
-	</adminhtml_shippingip_sync_ajax_catalog>
-	<adminhtml_shippingip_sync_ajax_checkitems>
-		<reference name="head">
-			<action method="setTitle"><title>i-parcel Check Items</title></action>
-		</reference>
-		<reference name="content">
-			<block type="core/template" name="checkitems.sync" template="iparcel/sync/ajax/checkitems.phtml" />
-		</reference>
-	</adminhtml_shippingip_sync_ajax_checkitems>
-	<adminhtml_shippingip_log_index>
-		<reference name="content">
-			<block type="shippingip/adminhtml_logs" name="iparcel.logs" as="logs" />
-		</reference>
-	</adminhtml_shippingip_log_index>
+    <adminhtml_sales_order_shipment_view>
+        <reference name="head">
+            <action method="addJs"><script>iparcel/adminhtml/label.js</script></action>
+        </reference>
+    </adminhtml_sales_order_shipment_view>
 </layout>

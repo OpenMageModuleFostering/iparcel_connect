@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <tabs>
+        <i-parcel translate="label" module="ipglobalecommerce">
+        <label>i-parcel</label>
+            <sort_order>500</sort_order>
+        </i-parcel>
+    </tabs>
+    <sections>
+        <payment>
+            <groups>
+                <iparcel translate="label" module="ipglobalecommerce">
+                    <label>i-parcel</label>
+                    <sort_order>9999</sort_order>
+                    <show_in_default>0</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store> 
+                </iparcel>
+            </groups>
+        </payment>
+        <iparcel>
+            <label>Configuration</label>
+            <tab>i-parcel</tab>
+            <frontent_type>text</frontent_type>
+            <sort_order>100</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>0</show_in_store>
+            <groups>
+                <scripts translate="label">
+                    <label>Scripts</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>5</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <scripts translate="label">
+                            <label>Enable Frontend Scripts</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </scripts>
+                        <jquery translate="label">
+                            <label>Enable jQuery</label>
+                            <comment>Set it to "no" if you're using another jQuery library</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </jquery>
+                        <post translate="label">
+                            <label>Custom POST scripts</label>
+                            <frontend_type>file</frontend_type>
+                            <backend_model>ipglobalecommerce/config_script_js</backend_model>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </post>
+                    </fields>
+                </scripts>
+                <international_customer translate="label">
+                    <label>International Customer</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enable translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable>
+                        <visibility translate="label">
+                            <label>Catalog product visibility attribute</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ipglobalecommerce/system_config_source_catalog_product_attribute_boolean</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip>If chosen attribute has value 'true' catalog product will be visible for international customer</tooltip>
+                        </visibility>
+                    </fields>
+                </international_customer>
+            </groups>
+        </iparcel>
+        <external_api>
+            <label>External API</label>
+            <tab>i-parcel</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>120</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
+            <groups>
+                <sales translate="label">
+                    <label>Sales</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled>
+                            <label>Enable External Sales API</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <transactional_emails>
+                            <label>Suppress Transactional e-mails</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </transactional_emails>
+                        <order_status>
+                            <label>New Order Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ipglobalecommerce/system_config_source_sales_order_status</source_model>
+                            <sort_order>114</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </order_status>
+                    </fields>
+                </sales>
+            </groups>
+        </external_api>
+    </sections>
+</config>
