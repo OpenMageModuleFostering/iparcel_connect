@@ -4,7 +4,7 @@
  *
  * @category    Iparcel
  * @package         Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>, Maciej Jarmuła <maciej.jarmula@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Model_Config_Script_Js extends Mage_Adminhtml_Model_System_Config_Backend_File
 {

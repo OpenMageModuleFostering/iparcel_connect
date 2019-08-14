@@ -4,7 +4,7 @@
  *
  * @category    Iparcel
  * @package         Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiocoders.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Helper_String
 {

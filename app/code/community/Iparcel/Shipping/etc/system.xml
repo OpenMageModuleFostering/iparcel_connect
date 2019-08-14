@@ -145,7 +145,7 @@
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
 							<show_in_store>0</show_in_store>
-							<tooltip>This is the Customer ID provided by i-parcel.</tooltip>
+							<tooltip>This is the Company ID provided by i-parcel.</tooltip>
 						</custid>
 						<userid translate="label">
 							<label>Web Service Key (GUID)</label>

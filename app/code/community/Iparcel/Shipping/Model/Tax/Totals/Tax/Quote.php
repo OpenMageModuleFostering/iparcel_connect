@@ -4,7 +4,7 @@
  *
  * @category    Iparcel
  * @package         Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Model_Tax_Totals_Tax_Quote extends Iparcel_Shipping_Model_Tax_Totals_Abstract
 {

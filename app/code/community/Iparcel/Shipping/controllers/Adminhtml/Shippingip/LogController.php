@@ -4,7 +4,7 @@
  *
  * @category    Iparcel
  * @package         Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Adminhtml_Shippingip_LogController extends Mage_Adminhtml_Controller_Action
 {
@@ -37,7 +37,9 @@ class Iparcel_Shipping_Adminhtml_Shippingip_LogController extends Mage_Adminhtml
      */
     public function clearAction()
     {
-        Mage::getModel('shippingip/api_log')->clear();
+        if (Mage::getModel('shippingip/api_log')->clear() === false) {
+            Mage::getSingleton('core/session')->addError($this->__('Unable to write to the log file.'));
+        }
         $this->_redirect('*/*/index');
     }
 }

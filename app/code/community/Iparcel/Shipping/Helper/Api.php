@@ -7,7 +7,7 @@
  *
  * @category    Iparcel
  * @package     Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Helper_Api
 {
@@ -19,9 +19,6 @@ class Iparcel_Shipping_Helper_Api
 
     /** @var string URL for the SubmitParcel endpoint */
     protected $_submitParcel = 'https://webservices.i-parcel.com/api/SubmitParcel';
-
-    /** @var string URL for the BusinessSettings endpoint */
-    protected $_businessSettings = 'https://webservices.i-parcel.com/api/BusinessSettings';
 
     /** @var string URL for the CheckItems endpoint */
     protected $_checkItems = 'https://webservices.i-parcel.com/api/CheckItems';
@@ -235,7 +232,6 @@ class Iparcel_Shipping_Helper_Api
                     //append the product name with the custom option
                     $item['ProductName'] = $name . $customOptionName;
                     $items['SKUs'][] = $item;
-                    $numberUploaded++;
                 }
             } else {
                 $items['SKUs'][] = $item;
@@ -521,30 +517,6 @@ class Iparcel_Shipping_Helper_Api
     }
 
     /**
-     * Send Business Settings request
-     *
-     * @return stdClass Response from the BusinessSettings API
-     */
-    public function businessSettings()
-    {
-        // init log
-        $log = Mage::getModel('shippingip/api_log');
-        /* var $log Iparcel_Shipping_Model_Api_Log */
-        $log->setController('Business Settings');
-
-        $json = Mage::helper('shippingip')->getGuid();
-
-        $log->setRequest(json_encode($json));
-
-        $response = $this->_restJSON($json, $this->_businessSettings);
-
-        $log->setResponse($response);
-        $log->save();
-
-        return json_decode($response);
-    }
-
-    /**
      * Send Check Items request
      *
      * Takes the passed Product Collection and transforms it into data that can
@@ -713,18 +685,51 @@ class Iparcel_Shipping_Helper_Api
             $customOptions = array();
             $optSortOrder = $option["sort_order"];
             $optSortKey = 0;
-            foreach ($option->getValues() as $values) {
+
+            /**
+             * If this option has no values (text field, text area, etc.) just
+             * build a sku for the option ID, otherwise, build out each value as
+             * well.
+             */
+            if (count($option->getValues()) == 0) {
+                $productOption = $product->getOptions();
+                $productOption = $productOption[$option->getId()];
+
                 $customOption = array();
-                // create the sku portion with custom option id and option type id.. 1_2 -> Size_Large
-                $customOption["sku"] = $values["option_id"] . "-" . $values["option_type_id"];
-                $customOption["price"] = $values["price"];
-                $customOption["title"] = $values["title"];
-                $customOption["sort_order"] = $values["sort_order"];
-                // Add `required` bit. Used later to build SKU variations
-                $customOption['required'] = $option->getIsRequire();
-                // add custom option type to collection
+
+                $customOption["sku"] = $option->getId();
+                $customOption["price"] = $option->getPrice();
+                $customOption["title"] = $productOption->getTitle();;
+                $customOption["sort_order"] = $option->getSortOrder();
+                if (get_class($option) == 'MageWorx_CustomOptions_Model_Catalog_Product_Option') {
+                    $customOption['required'] = $option->getIsRequire(true);
+                } else {
+                    $customOption['required'] = $option->getIsRequire();
+                }
                 $customOptions[$optTypeCount] = $customOption;
                 $optTypeCount++;
+            } else {
+                foreach ($option->getValues() as $values) {
+                    $customOption = array();
+                    // create the sku portion with custom option id and option type id.. 1_2 -> Size_Large
+                    $customOption["sku"] = $values["option_id"] . "-" . $values["option_type_id"];
+                    $customOption["price"] = $values["price"];
+                    $customOption["title"] = $values["title"];
+                    $customOption["sort_order"] = $values["sort_order"];
+                    /**
+                     * Add `required` bit. Used later to build SKU variations.
+                     * If this store uses Mageworx_CustomOptions, act as if we are
+                     * on a product page
+                     */
+                    if (get_class($option) == 'MageWorx_CustomOptions_Model_Catalog_Product_Option') {
+                        $customOption['required'] = $option->getIsRequire(true);
+                    } else {
+                        $customOption['required'] = $option->getIsRequire();
+                    }
+                    // add custom option type to collection
+                    $customOptions[$optTypeCount] = $customOption;
+                    $optTypeCount++;
+                }
             }
             // maintain index to sort order relationship
             $productSorting[$optCount] = $optSortOrder;
@@ -757,6 +762,7 @@ class Iparcel_Shipping_Helper_Api
         $options = array_filter($options);
         $result = array(array());
         $optionalProductOptions = array();
+        $requiredOptions = true;
 
         // Remove the optional product options
         foreach ($options as $key => $option) {
@@ -780,8 +786,13 @@ class Iparcel_Shipping_Helper_Api
             $result = $append;
         }
 
+        // Check for any required options
+        if (count($result[0]) != 0 || count($result) == 1) {
+            $requiredOptions = false;
+        }
+
         // Add a new product to the $result array for each variation of optional
-        // product options.
+        // product options + the existing required options.
         foreach ($result as $productConfiguration) {
             foreach ($optionalProductOptions as $option) {
                 foreach ($option as $product) {
@@ -790,6 +801,16 @@ class Iparcel_Shipping_Helper_Api
                     $result[] = $newVariation;
                 }
             }
+        }
+
+        // If there were no required options, add all variations of optional
+        // product options
+        if ($requiredOptions == false && count($optionalProductOptions) > 1) {
+            $allOptionals = array();
+            foreach ($optionalProductOptions as $key => $option) {
+                $allOptionals[] = array_shift($option);
+            }
+            $result[] = $allOptionals;
         }
 
         return $result;

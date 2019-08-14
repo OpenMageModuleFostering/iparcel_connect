@@ -1,10 +1,3 @@
-/**
- * js lib for i-parcel's ajax sync
- *
- * @category	Iparcel
- * @package		Iparcel_Shipping
- * @author		Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
- */
 var iparcelSync = {
 	item: null,
 	sync: null,

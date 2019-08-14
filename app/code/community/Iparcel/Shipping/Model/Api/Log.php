@@ -2,9 +2,9 @@
 /**
  * i-parcel XML log model
  *
- * Category Iparcel
- * Package  Iparcel_Shipping
- * Author       Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @category Iparcel
+ * @package  Iparcel_Shipping
+ * @author   Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Model_Api_Log extends Varien_Object
 {
@@ -35,28 +35,28 @@ class Iparcel_Shipping_Model_Api_Log extends Varien_Object
             return $response;
         }
 
-        $file = fopen($this->getLogFilename(), "r");
-        $this->_jsonData = json_decode(fread($file, filesize($this->getLogFilename())), true);
-        fclose($file);
-
-        if (!is_array($this->_jsonData)) {
-            if (!$this->_clear()) {
-                Mage::throwException(Mage::helper('shippingip')->__('Access Forbidden for i-parcel log file'));
-            }
+        $logFilesize = filesize($this->getLogFilename());
+        if ($logFilesize > 0) {
+            $file = fopen($this->getLogFilename(), "r");
+            $this->_jsonData = json_decode(fread($file, filesize($this->getLogFilename())), true);
+            fclose($file);
+        } else {
             $this->_jsonData = array();
-            return $response;
         }
 
         // for each json log node append Varien Object to Varien Data Collection
-        foreach ($this->_jsonData['logs'] as $log) {
-            $_log = new Varien_Object(array(
-                'timestamp' => $log['Timestamp'],
-                'controller' => $log['Controller'],
-                'response' => $log['Response'],
-                'request' => $log['Request']
-            ));
-            $response->addItem($_log);
+        if (array_key_exists('logs', $this->_jsonData)) {
+            foreach ($this->_jsonData['logs'] as $log) {
+                $_log = new Varien_Object(array(
+                    'timestamp' => $log['Timestamp'],
+                    'controller' => $log['Controller'],
+                    'response' => $log['Response'],
+                    'request' => $log['Request']
+                ));
+                $response->addItem($_log);
+            }
         }
+
         return $response;
     }
 
@@ -112,7 +112,13 @@ class Iparcel_Shipping_Model_Api_Log extends Varien_Object
      */
     protected function _clear()
     {
-        return unlink($this->getLogFilename());
+        $file = fopen($this->getLogFilename(), 'w');
+        if ($file === false) {
+            return false;
+        }
+        fclose($file);
+
+        return true;
     }
 
     /**
@@ -157,6 +163,12 @@ class Iparcel_Shipping_Model_Api_Log extends Varien_Object
      */
     public function clear()
     {
-        return $this->_clear();
+        $response = $this->_clear();
+
+        if ($response === false) {
+            return false;
+        }
+
+        return true;
     }
 }

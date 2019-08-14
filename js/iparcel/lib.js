@@ -1,10 +1,3 @@
-/**
- * i-parcel frontend lib for post scripts
- *
- * @category	Iparcel
- * @package		Iparcel_Shipping
- * @author		Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
- */
 var iparcelMage = {
 	displayEligibility: function(){
 		try{
@@ -12,7 +5,7 @@ var iparcelMage = {
 		}catch(exception){}
 	},
 	ajax: {
-		post: function(sku, super_attribute, url){
+		post: function(sku, super_attribute, url) {
 			var $jip = jQuery.noConflict();
 			var data = super_attribute+'sku='+sku;
 			$jip.ajax({

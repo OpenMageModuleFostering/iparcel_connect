@@ -4,7 +4,7 @@
  *
  * @category        Iparcel
  * @package             Iparcel_Shipping
- * @author          Patryk Grudniewski <patryk.grudniewski@sabiosystem.com
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_InternationalController extends Mage_Core_Controller_Front_Action
 {

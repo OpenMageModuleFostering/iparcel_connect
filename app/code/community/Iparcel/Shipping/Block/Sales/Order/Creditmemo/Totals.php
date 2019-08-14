@@ -4,7 +4,7 @@
  *
  * @category     Iparcel
  * @package      Iparcel_Shipping
- * @author       Patryk Grudniewski
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Block_Sales_Order_Creditmemo_Totals extends Mage_Sales_Block_Order_Creditmemo_Totals
 {

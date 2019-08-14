@@ -3,11 +3,19 @@
  * i-parcel External Sales API processing model
  *
  * @category    Iparcel
- * @package         Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @package     Iparcel_Shipping
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
-class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object
+class Iparcel_Shipping_Model_Api_External_Sales_Order extends Mage_Core_Model_Abstract
 {
+    /**
+     * Initialize resource model
+     */
+    protected function _construct()
+    {
+        $this->_init('shippingip/api_order');
+    }
+
     /**
      * Initialize adminhtml quote session
      *
@@ -32,7 +40,7 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object
     /**
      * Processing quote
      *
-     * @return Iparcel_Shipping_MOdel_Api_External_Sales_Order
+     * @return Iparcel_Shipping_Model_Api_External_Sales_Order
      */
     protected function _processQuote()
     {
@@ -239,14 +247,18 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object
                 'qty' => $product['qty'],
                 'price' => is_string($product['price']) ? (float)str_replace(",", ".", $product['price']) : $product['price']
             );
-            foreach ($product['options'] as $code => $value) {
-                $_options->addItem(new Varien_Object(
-                    array(
-                        'product' => $_product,
-                        'code' => $code,
-                        'value' => $value
-                    )
-                ));
+
+            if (array_key_exists('options', $product)) {
+                foreach ($product['options'] as $code => $value) {
+                    $_options->addItem(new Varien_Object(
+                        array(
+                            'product' => $_product,
+                            'code' => $code,
+                            'value' => $value
+                        )
+                    ));
+                }
+                $_products[$_product->getId()]['options'] = $product['options'];
             }
         }
         // set products and options
@@ -303,14 +315,14 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object
                     'city' => $_customerShippingAddress->getCity(),
                     'country_id' => $_customerShippingAddress->getCountryId(),
                     'region' => $_customerShippingAddress->getRegion(),
-                    'region_id' => $_customerBillingAddress->getRegionId(),
+                    'region_id' => $_customerShippingAddress->getRegionId(),
                     'postcode' => $_customerShippingAddress->getPostcode(),
                     'telephone' => $_customerShippingAddress->getTelephone(),
                     'fax' => ''
                 ),
                 'shipping_method' => 'i-parcel_auto',
                 'comment' => array(
-                    'customer_note' => 'This order has ben programmatically created via I-Parcel extension'
+                    'customer_note' => 'This order has been programmatically created via I-Parcel extension'
                 ),
                 'send_confirmation' => '0'
             ),
@@ -345,8 +357,14 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object
         foreach ($this->getProducts() as $id => $productData) {
             $_product = Mage::getModel('catalog/product')->load($id);
             /* var $_product Mage_Catalog_Model_Product */
-            $item = Mage::getSingleton('adminhtml/sales_order_create')->getQuote()->getItemByProduct($_product);
-            /* var $item Mage_Sales_Model_Quote_Item */
+            $items = Mage::getSingleton('adminhtml/sales_order_create')->getQuote()->getItemsCollection();
+            $item = false;
+            foreach($items as $currentItem) {
+                if ($currentItem->getProduct()->getId() == $id) {
+                    $item = $currentItem;
+                    break;
+                }
+            }
             if (!$item) {
                 continue;
             }
@@ -355,6 +373,7 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object
                     $item->addOption($option);
                 }
             }
+
             $price = empty($productData['price']) ? $_product->getFinalPrice() : $productData['price'];
             $qty = $productData['qty'];
             $item->setCustomPrice($price);
@@ -475,5 +494,17 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object
     {
         Mage::getSingleton('checkout/session')->setTrackingNumber($number);
         return parent::setTrackingNumber($number);
+    }
+
+    /**
+     * Load an Order by Tracking Number
+     *
+     * @param string $trackingNumber
+     * @return Iparcel_Shipping_Model_Api_External_Sales_Order
+     */
+    public function loadByTrackingNumber($trackingNumber)
+    {
+        $this->load($trackingNumber, 'tracking_number');
+        return $this;
     }
 }

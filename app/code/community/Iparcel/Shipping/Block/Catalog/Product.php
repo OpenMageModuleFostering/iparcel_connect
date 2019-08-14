@@ -4,7 +4,7 @@
  *
  * @category   Iparcel
  * @package    Iparcel_Shipping
- * @author       Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Block_Catalog_Product extends Mage_Catalog_Block_Product_View
 {

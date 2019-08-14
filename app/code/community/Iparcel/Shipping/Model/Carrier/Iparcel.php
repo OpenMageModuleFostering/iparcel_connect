@@ -4,7 +4,7 @@
  *
  * @category    Iparcel
  * @package         Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier_Abstract implements Mage_Shipping_Model_Carrier_Interface
 {
@@ -115,89 +115,65 @@ class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier
 
                 $result = Mage::getModel('shipping/rate_result');
                 /*var $result Mage_Shipping_Model_Rate_Result */
-                $businessSettings = Mage::helper('shippingip/api')->businessSettings();
-                /* var $businessSettings stdClass */
 
-                // collect rates only if the business settings model is 2 or 3
-                if (/*true || */$businessSettings &&
-                    isset($businessSettings->model) &&
-                    in_array($businessSettings->model, array(2, 3))) {
-                    $quote = Mage::helper('shippingip/api')->quote($request);
-                    /* var $quote stdClass */
+                $quote = Mage::helper('shippingip/api')->quote($request);
+                /* var $quote stdClass */
 
-                    $serviceLevel = isset($quote->ServiceLevels) ?
-                    $quote->ServiceLevels :
-                    (object)array();
+                $serviceLevel = isset($quote->ServiceLevels) ? $quote->ServiceLevels : (object)array();
 
-                        //$serviceLevel = (object)array(
-                            //(object)array(
-                                //'ServiceLevelID'	=> 'test1',
-                                //'DutyCompanyCurrency'	=> '2.33',
-                                //'TaxCompanyCurrency' => '3.33',
-                                //'ShippingChargeCompanyCurrency' => '4.33'
-                            //),
-                            //(object)array(
-                                //'ServiceLevelID'	=> 'test2',
-                                //'DutyCompanyCurrency'	=> '3.33',
-                                //'TaxCompanyCurrency' => '4.33',
-                                //'ShippingChargeCompanyCurrency' => '5.33'
-                            //)
-                        //);
+                // Load shipping methods names
+                $methods_names = $this->getMethodsNames();
+                /* var $methods_names array */
 
-                        // Load shipping methods names
-                        $methods_names = $this->getMethodsNames();
-                        /* var $methods_names array */
+                // Handling serviceLevels results and set up the shipping method
+                foreach ($serviceLevel as $ci) {
+                    // setting up values
+                    $servicename = @$ci->ServiceLevelID;
 
-                        // Handling serviceLevels results and set up the shipping method
-                    foreach ($serviceLevel as $ci) {
-                        // setting up values
-                        $servicename = @$ci->ServiceLevelID;
+                    $duty = (float)@$ci->DutyCompanyCurrency;
+                    $tax = (float)@$ci->TaxCompanyCurrency;
+                    $shipping = (float)@$ci->ShippingChargeCompanyCurrency;
 
-                        $duty = (float)@$ci->DutyCompanyCurrency;
-                        $tax = (float)@$ci->TaxCompanyCurrency;
-                        $shipping = (float)@$ci->ShippingChargeCompanyCurrency;
+                    $tax_flag = Mage::getStoreConfig('iparcel/tax/mode') == Iparcel_Shipping_Model_System_Config_Source_Tax_Mode::DISABLED
+                                || $request->getDestCountryId() == $request->getCountryId();
+                    // true if tax intercepting is disabled
 
-                                                $tax_flag = Mage::getStoreConfig('iparcel/tax/mode') == Iparcel_Shipping_Model_System_Config_Source_Tax_Mode::DISABLED
-                                                    || $request->getDestCountryId() == $request->getCountryId();
-                        // true if tax intercepting is disabled
-
-                        $total = $tax_flag ? (float)($duty + $tax + $shipping) : (float)$shipping;
-                        if (!isset($methods_names[$servicename])) {
-                            continue;
-                        }
-                        $shiplabel = $methods_names[$servicename];
-                        $title = $tax_flag ?
-                            Mage::helper('shippingip')
-                                ->__(
-                                    '%s (Shipping Price: %s Duty: %s Tax: %s)',
-                                    $shiplabel,
-                                    $this->_formatPrice($shipping),
-                                    $this->_formatPrice($duty),
-                                    $this->_formatPrice($tax)
-                                ) :
-                            $shiplabel;
-
-                        $method = Mage::getModel('shipping/rate_result_method');
-                        $method->setCarrier('i-parcel');
-                        $method->setCarrierTitle('i-parcel');
-                        $method->setMethod($servicename);
-                        $method->setMethodTitle($title);
-                        $method->setPrice($total);
-                        $method->setCost($total);
-                        $method->setPriceOriginal($total);
-                        $method->setPriceDuty($duty);
-                        $method->setPriceTax($tax);
-                        $method->setPriceInsurance($total);
-                        $method->setPackageWeight($request->getPackageWeight());
-
-                        // append method to result
-                        $result->append($method);
-
-                        $iparcel['i-parcel_' . $servicename] = array(
-                            'duty' => $duty,
-                            'tax' => $tax
-                        );
+                    $total = $tax_flag ? (float)($duty + $tax + $shipping) : (float)$shipping;
+                    if (!isset($methods_names[$servicename])) {
+                        continue;
                     }
+                    $shiplabel = $methods_names[$servicename];
+                    $title = $tax_flag ?
+                        Mage::helper('shippingip')
+                            ->__(
+                                '%s (Shipping Price: %s Duty: %s Tax: %s)',
+                                $shiplabel,
+                                $this->_formatPrice($shipping),
+                                $this->_formatPrice($duty),
+                                $this->_formatPrice($tax)
+                            ) :
+                        $shiplabel;
+
+                    $method = Mage::getModel('shipping/rate_result_method');
+                    $method->setCarrier('i-parcel');
+                    $method->setCarrierTitle('i-parcel');
+                    $method->setMethod($servicename);
+                    $method->setMethodTitle($title);
+                    $method->setPrice($total);
+                    $method->setCost($total);
+                    $method->setPriceOriginal($total);
+                    $method->setPriceDuty($duty);
+                    $method->setPriceTax($tax);
+                    $method->setPriceInsurance($total);
+                    $method->setPackageWeight($request->getPackageWeight());
+
+                    // append method to result
+                    $result->append($method);
+
+                    $iparcel['i-parcel_' . $servicename] = array(
+                        'duty' => $duty,
+                        'tax' => $tax
+                    );
                 }
                 Mage::unregister('iparcel');
                 Mage::register('iparcel', $iparcel);

@@ -3,7 +3,7 @@
  *
  * @category		Iparcel
  * @package			Iparcel_Shipping
- * @author			Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Block_Sales_Order_Invoice_Totals extends Mage_Sales_Block_Order_Invoice_Totals
 {

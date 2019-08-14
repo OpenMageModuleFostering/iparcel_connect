@@ -1,7 +1,8 @@
 <?php
 $installer = $this;
 $connection = $installer->getConnection();
-$data = Mage::getModel('shippingip/parcel')->getCollection()->toArray()['items'];
+$data = Mage::getModel('shippingip/parcel')->getCollection()->toArray();
+$data = $data['items'];
 
 $installer->startSetup();
 if ($connection->isTableExists($installer->getTable('shippingip/parcel'))) {

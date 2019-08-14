@@ -4,7 +4,7 @@
  *
  * @category    Iparcel
  * @package         Iparcel_Shipping
- * @author      Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Model_Tax_Calculation extends Mage_Tax_Model_Calculation
 {
@@ -19,8 +19,10 @@ class Iparcel_Shipping_Model_Tax_Calculation extends Mage_Tax_Model_Calculation
         if (!$request->getCountryId() || !$request->getCustomerClassId() || !$request->getProductClassId()) {
             return 0;
         }
-        /* var $quote Mage_Sales_Model_Quote */
+        /** @var Mage_Sales_Model_Quote $quote Current session's quote */
         $quote = Mage::getSingleton('checkout/session')->getQuote();
+
+        $shippingMethod = explode('_', $quote->getShippingAddress()->getShippingMethod());
         // if no quote go to parent
         // if i-parcel tax&duty intercepting is disabled go to parent
         // if quote is virtual go to parent
@@ -28,14 +30,12 @@ class Iparcel_Shipping_Model_Tax_Calculation extends Mage_Tax_Model_Calculation
         if (!$quote->getId()
             || Mage::getStoreConfig('iparcel/tax/mode') == Iparcel_Shipping_Model_System_Config_Source_Tax_Mode::DISABLED
             || $quote->isVirtual()
-            || explode('_', $quote->getShippingAddress()->getShippingMethod())[0] != 'i-parcel'
+            || $shippingMethod[0] != 'i-parcel'
             || Mage::getStoreConfig('general/store_information/merchant_country') == $request->getCountryId()) {
             return parent::getRate($request);
         }
         $method = $quote->getShippingAddress()->getShippingMethod();
-    /* var $method string */
         $method = explode('_', $method);
-    /* var $method array */
         // if not i-parcel shipping go to parent
         if ($method[0] != 'i-parcel') {
             return parent::getRate($request);

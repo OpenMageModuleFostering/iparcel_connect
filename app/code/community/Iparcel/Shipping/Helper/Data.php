@@ -4,7 +4,7 @@
  *
  * @category        Iparcel
  * @package             Iparcel_Shipping
- * @author          Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ * @author     Bobby Burden <bburden@i-parcel.com>
  */
 class Iparcel_Shipping_Helper_Data extends Mage_Core_Helper_Abstract
 {
@@ -36,5 +36,16 @@ class Iparcel_Shipping_Helper_Data extends Mage_Core_Helper_Abstract
     public function getScriptUrl()
     {
         return '//script.i-parcel.com/';
+    }
+
+    /**
+     * Escape quotation mark in strings for inclusion in JavaScript objects
+     *
+     * @param string $string String to escape
+     * @return string
+     */
+    public function jsEscape($string = '')
+    {
+        return addcslashes($string, "\"");
     }
 }

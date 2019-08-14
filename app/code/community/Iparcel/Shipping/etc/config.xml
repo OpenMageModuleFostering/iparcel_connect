@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Iparcel_Shipping>
-            <version>2.4.6</version>
+            <version>2.4.7</version>
         </Iparcel_Shipping>
     </modules>
     <crontab>
@@ -90,8 +90,7 @@
                 <class>Iparcel_Shipping_Model_Resource</class>
                 <entities>
                     <api_order>
-                        <!-- DEPRECATED in v2.3.4.2 -->
-                        <table>iparcel_shipping_api_orders</table>
+                        <table>iparcel_shipping_api_order</table>
                     </api_order>
                     <cpf>
                         <table>iparcel_shipping_cpf</table>
@@ -110,11 +109,6 @@
                     </tax_totals>
                 </entities>
             </shippingip_resource>
-            <sales>
-                <rewrite>
-                    <order>Iparcel_Shipping_Model_Sales_Order</order>
-                </rewrite>
-            </sales>
             <tax>
                 <rewrite>
                     <calculation>Iparcel_Shipping_Model_Tax_Calculation</calculation>
@@ -221,6 +215,42 @@
                     </iparcel_sales_quote_save_before_observer>
                 </observers>
             </sales_quote_save_before>
+            <model_load_before>
+                <observers>
+                    <iparcel_model_load_before_observer>
+                        <type>singleton</type>
+                        <class>Iparcel_Shipping_Model_Observer</class>
+                        <method>createCheckState</method>
+                    </iparcel_model_load_before_observer>
+                </observers>
+            </model_load_before>
+            <adminhtml_cache_refresh_type>
+                <observers>
+                    <iparcel_adminhtml_cache_refresh_type_observer>
+                        <type>singleton</type>
+                        <class>Iparcel_Shipping_Model_Observer</class>
+                        <method>removeExtendFile</method>
+                    </iparcel_adminhtml_cache_refresh_type_observer>
+                </observers>
+            </adminhtml_cache_refresh_type>
+            <adminhtml_cache_flush_all>
+                <observers>
+                    <iparcel_adminhtml_cache_flush_all_observer>
+                        <type>singleton</type>
+                        <class>Iparcel_Shipping_Model_Observer</class>
+                        <method>removeExtendFile</method>
+                    </iparcel_adminhtml_cache_flush_all_observer>
+                </observers>
+            </adminhtml_cache_flush_all>
+            <adminhtml_cache_flush_system>
+                <observers>
+                    <iparcel_adminhtml_cache_flush_system_observer>
+                        <type>singleton</type>
+                        <class>Iparcel_Shipping_Model_Observer</class>
+                        <method>removeExtendFile</method>
+                    </iparcel_adminhtml_cache_flush_system_observer>
+                </observers>
+            </adminhtml_cache_flush_system>
         </events>
         <resources>
             <shippingip_setup>
