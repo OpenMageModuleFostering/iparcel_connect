@@ -23,7 +23,6 @@ class Iparcel_Shipping_Model_Tax_Calculation extends Mage_Tax_Model_Calculation{
 		// if no quote go to parent
 		// if i-parcel tax&duty intercepting is disabled go to parent
 		// if quote is virtual go to parent
-		// if not i-parcel shipping go to parent
 		// if not domestic shipping go to parent
 		if (!$quote->getId()
 			|| Mage::getStoreConfig('iparcel/tax/mode') == Iparcel_Shipping_Model_System_Config_Source_Tax_Mode::DISABLED
@@ -32,6 +31,14 @@ class Iparcel_Shipping_Model_Tax_Calculation extends Mage_Tax_Model_Calculation{
 			|| Mage::getStoreConfig('general/store_information/merchant_country') == $request->getCountryId()){
 			return parent::getRate($request);
 		}
+    $method = $quote->getShippingAddress()->getShippingMethod();
+    /* var $method string */
+    $method = explode('_',$method);
+    /* var $method array */
+		// if not i-parcel shipping go to parent
+    if($method[0] != 'i-parcel'){
+      return parent::getRate($request);
+    }
 
 		/* var $totals array */
 		$totals = $quote->getTotals();

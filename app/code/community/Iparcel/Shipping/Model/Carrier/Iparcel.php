@@ -118,9 +118,6 @@ class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier
                     in_array($businessSettings->model, array(2, 3))) {
                     $quote = Mage::helper('shippingip/api')->quote($request);
                     /* var $quote stdClass */
-                    //if (!$quote) {
-                        //return false;
-                    //}
 
                     $serviceLevel = isset($quote->ServiceLevels) ?
                         $quote->ServiceLevels :
@@ -141,7 +138,11 @@ class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier
 											//)
 										//);
 
-                    // Handling serviceLevels results and set up the shipping method
+										// Load shipping methods names
+										$methods_names = $this->getMethodsNames();
+										/* var $methods_names array */
+
+										// Handling serviceLevels results and set up the shipping method
                     foreach ($serviceLevel as $ci) {
                         // setting up values
                         $servicename = @$ci->ServiceLevelID;
@@ -155,7 +156,10 @@ class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier
                         // true if tax intercepting is disabled
 
                         $total = $tax_flag ? (float)($duty + $tax + $shipping) : (float)$shipping;
-                        $shiplabel = Mage::getStoreConfig('carriers/i-parcel/whitelabelship');
+												if(!isset($methods_names[$servicename])){
+													continue;
+												}
+                        $shiplabel = $methods_names[$servicename];
                         $title = $tax_flag ?
                             Mage::helper('shippingip')
                                 ->__('%s (Shipping Price: %s Duty: %s Tax: %s)',
@@ -177,7 +181,6 @@ class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier
                         $method->setPriceTax($tax);
                         $method->setPriceInsurance($total);
                         $method->setPackageWeight($request->getPackageWeight());
-                        $method->setMethodDescription(Mage::getStoreConfig('carriers/i-parcel/whitelabelship') . ': ' . Mage::getStoreConfig('carriers/i-parcel/backend_name'));
 
                         // append method to result
                         $result->append($method);
@@ -196,6 +199,19 @@ class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier
             Mage::logException($e);
         }
         return false;
+	}
+
+	public function getMethodsNames(){
+		$names = array();
+		$raw = Mage::getStoreConfig('carriers/i-parcel/name');
+
+		$raw = unserialize($raw);
+
+		foreach($raw as $method){
+			$names[$method['service_id']] = $method['title'];
+		}
+
+		return $names;
 	}
 
     /**

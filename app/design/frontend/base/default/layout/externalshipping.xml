@@ -20,6 +20,23 @@
 			<block type="shippingip/catalog_product_list" name="shippingip_sku.list" template="shippingip/post/list.phtml" />
 		</reference>
 	</catalog_category_view>
+  <catalogsearch_result_index>
+		<reference name="head">
+			<action method="addJs"><script>iparcel/lib.js</script></action>
+			<block type="shippingip/html_head_post" name="iparcel_post" template="shippingip/html/head/post.phtml" />
+      <block type="shippingip/catalogsearch_result" name="shippingip_sku.list" template="shippingip/post/list.phtml">
+        <block type="catalog/product_list" name="search_result_list" template="catalog/product/list.phtml"/>
+        <action method="setListCollection"/>
+      </block>
+		</reference>
+  </catalogsearch_result_index>
+  <catalogsearch_advanced_result>
+		<reference name="head">
+			<action method="addJs"><script>iparcel/lib.js</script></action>
+			<block type="shippingip/html_head_post" name="iparcel_post" template="shippingip/html/head/post.phtml" />
+			<block type="shippingip/catalogsearch_advanced_result" name="shippingip_sku.list" template="shippingip/post/list.phtml" />
+		</reference>
+  </catalogsearch_advanced_result>
 	<checkout_onepage_index>
 		<reference name="head">
 			<action method="addJs"><script>iparcel/cpf.js</script></action>

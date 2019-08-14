@@ -77,5 +77,13 @@ class Iparcel_Shipping_DevController extends Mage_Core_Controller_Front_Action{
 			echo $e->getMessage();
 		}
 	}
+
+  public function orderAction(){
+    $requestString = 'user[email]=tester@i-parcel.com&user[firstname]=Stefan&user[lastname]=eCom-Test&user[password]=nopassword&user[address][new]=1&user[address][firstname]=Stefan&user[address][lastname]=eCom-Test&user[address][street]=25 Test St &user[address][city]=York&user[address][region_id]=PA&user[address][postcode]=555555&user[address][country_id]=GB&user[address][telephone]=555-555-5555&key=63288480-915F-4DBD-9913-AD710742AC9E&tax=78.36&shipping=24.72&currency=USD&tracking[email]=tester@i-parcel.com&tracking[number]=1205535867US&orders[0][sku]=hdb008&orders[0][qty]=1&orders[0][price]=240.00';
+
+    parse_str($requestString,$data);
+
+    $this->_forward('add','order','shippingip',$data);
+  }
 }
 ?>

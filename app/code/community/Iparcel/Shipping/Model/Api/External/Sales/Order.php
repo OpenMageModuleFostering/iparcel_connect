@@ -124,6 +124,12 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object{
 		if (!$customer){
 			Mage::throwException('Customer is not specified');
 		}
+
+    /* if no default billing do nothing */
+    if(!$customer->getDefaultBilling()){
+      return $this;
+    }
+
 		$address = Mage::getModel('customer/address')->load($customer->getDefaultBilling());
 		/* var $address Mage_Customer_Model_Address */
 		return parent::setCustomerBillingAddress($address);
@@ -168,6 +174,12 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object{
 		if (!$customer){
 			Mage::throwException('Customer is not specified');
 		}
+
+    /* if no default shipping do nothing */
+    if(!$customer->getDefaultShippingAddress()){
+      return $this;
+    }
+
 		$address = Mage::getModel('customer/address')->load($customer->getDefaultShippingAddress());
 		/* var $address Mage_Customer_Model_Address */
 		return parent::setCustomerShippingAddress($address);
@@ -208,7 +220,7 @@ class Iparcel_Shipping_Model_Api_External_Sales_Order extends Varien_Object{
 
 		$_customerBillingAddress = $this->getCustomerBillingAddress();
 		/* var $_customerBillingAddress Mage_Customer_Model_Address */
-		$_customerShippingAddress = $this->getCustomerShippingAddress();
+		$_customerShippingAddress = $this->getCustomerShippingAddress() ?: $this->getCustomerBillingAddress();
 		/* var $_customerShippingAddress Mage_Customer_Model_Address */
 		$_customer = $this->getCustomer();
 		/* var $_customer Mage_Customer_Model_Customer */

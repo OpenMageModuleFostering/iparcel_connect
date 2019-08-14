@@ -22,7 +22,7 @@ class Iparcel_Shipping_Helper_Api{
 	protected function _rest($post, $url, array $header){
 		$curl = curl_init($url);
 
-		$timeout = Mage::getStoreConfig('iparcel/config/timeout');
+		$timeout = 15;
 		if($timeout){
 			curl_setopt($curl, CURLOPT_TIMEOUT,$timeout);
 		}
@@ -406,10 +406,19 @@ class Iparcel_Shipping_Helper_Api{
 		if(isset($totals['discount']) && $totals['discount']->getValue()) 
 			$discount = -1 * $totals['discount']->getValue();
 
+		// Get ServiceLevelID
+		$method = $order->getShippingMethod();
+		/* var $method string */
+		$method = explode('_',$method);
+		/* var $method array */
+		array_shift($method);
+		$serviceLevelId = implode('_',$method);
+		/* var $serviceLevelId string */
+
 		$json['OtherDiscount'] = $discount;
 		$json['OtherDiscountCurrency'] = $quote->getQuoteCurrencyCode();
 		$json['ParcelID'] = Mage::getSingleton('checkout/session')->getParcelId();
-		$json['ServiceLevel'] = 115;
+		$json['ServiceLevel'] = $serviceLevelId;
 		$json['SessionID'] = '';
 		$json['key'] = Mage::helper('shippingip')->getGuid();
 
