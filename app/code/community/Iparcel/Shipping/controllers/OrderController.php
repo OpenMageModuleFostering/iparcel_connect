@@ -241,6 +241,18 @@ class Iparcel_Shipping_OrderController extends Mage_Core_Controller_Front_Action
                 ->loadByAttribute('sku', $order['sku']);
             $options = $order['options'];
 
+            if (is_null($product) || $product == false) {
+                /**
+                 * If this product has options, and has a generated SKU, the
+                 * product won't load from the SKU. Instead, strip the options
+                 * and load the product.
+                 */
+                $sku = preg_replace('/__.*/', '', $order['sku']);
+                $product = Mage::getModel('catalog/product')
+                    ->loadByAttribute('sku', $sku);
+                $order['sku'] = $sku;
+            }
+
             $product = $product->load($product->getId());
             $productOptions = $product->getOptions();
 

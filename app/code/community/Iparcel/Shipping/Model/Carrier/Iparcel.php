@@ -78,7 +78,9 @@ class Iparcel_Shipping_Model_Carrier_Iparcel extends Mage_Shipping_Model_Carrier
         $pdf = new Zend_Pdf();
         $number = $tracking->getNumber();
         $pdfPage = $pdf->pages[] = new Zend_Pdf_Page(('162:75'));
-        $barcodeFont = Zend_Pdf_Font::fontWithPath(Mage::getBaseDir('media').'/font/code128.ttf');
+        $barcodeFont = Zend_Pdf_Font::fontWithPath(
+            Mage::getBaseDir('skin') . '/adminhtml/default/default/iparcel/font/code128.ttf'
+        );
         $courier = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_COURIER);
         $pdfPage->setFont($courier, 10);
         $pdfPage->drawText($number, 15, 10);
