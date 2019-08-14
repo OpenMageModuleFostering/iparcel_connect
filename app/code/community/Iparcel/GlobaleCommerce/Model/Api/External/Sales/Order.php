@@ -57,7 +57,13 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         $_orderCreate->importPostData($data['order']);
         $_orderCreate->getBillingAddress();
         $_orderCreate->setShippingAsBilling(true);
-        $_orderCreate->addProducts($data['add_products']);
+        foreach($data['add_products'] as $_product) {
+            $_productModel = $_product['product'];
+            unset($_product['product_id']);
+            unset($_product['product']);
+
+            $_orderCreate->addProduct($_productModel, $_product);
+        }
         $_orderCreate->getQuote()->getPayment()->addData($data['payment']);
         $_orderCreate->setPaymentData($data['payment']);
         $_orderCreate->initRuleData()->saveQuote();
@@ -246,9 +252,11 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
             }
             /* var $_product Mage_Catalog_Model_Product */
             $_product->load($_product->getId());
-            $_products[$_product->getId()] = array(
+            $_productAdd = array(
+                'product_id' => $_product->getId(),
                 'qty' => $product['qty'],
-                'price' => is_string($product['price']) ? (float)str_replace(",", ".", $product['price']) : $product['price']
+                'price' => is_string($product['price']) ? (float)str_replace(",", ".", $product['price']) : $product['price'],
+                'product' => $_product
             );
 
             if (array_key_exists('options', $product)) {
@@ -261,8 +269,9 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
                         )
                     ));
                 }
-                $_products[$_product->getId()]['options'] = $product['options'];
+                $_productAdd['options'] = $product['options'];
             }
+            $_products[] = $_productAdd;
         }
         // set products and options
         $this->setProducts($_products);
@@ -357,7 +366,8 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         $subtotal = 0;
 
         // processing order's items, setting prices, totals etc
-        foreach ($this->getProducts() as $id => $productData) {
+        foreach ($this->getProducts() as $productData) {
+            $id = $productData['product_id'];
             $_product = Mage::getModel('catalog/product')->load($id);
             /* var $_product Mage_Catalog_Model_Product */
             $items = Mage::getSingleton('adminhtml/sales_order_create')->getQuote()->getItemsCollection();
