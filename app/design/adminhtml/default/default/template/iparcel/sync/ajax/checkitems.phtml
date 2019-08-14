@@ -2,7 +2,7 @@
 /**
  * @category	design
  * @package		Iparcel_Shipping
- * @author     Bobby Burden <bburden@i-parcel.com>
+ * @author		Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
  * @class			Mage_Core_Block_Template
  */
 ?>
@@ -17,5 +17,5 @@
 <p>There was <span>0</span> errors when checking items</p>
 </div>
 <script type="text/javascript">
-var sync = new iparcelSync.sync('<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/shippingip_sync_ajax/checkitems') ?>?isAjax=true', 1);
+var sync = new iparcelSync.sync('<?php echo Mage::helper('adminhtml')->getUrl('shippingip/sync_ajax/checkitems') ?>?isAjax=true', 1);
 </script>

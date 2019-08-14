@@ -1,3 +1,10 @@
+/**
+ * i-parcel frontend lib for post scripts
+ *
+ * @category	Iparcel
+ * @package		Iparcel_Shipping
+ * @author		Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ */
 var iparcelMage = {
 	displayEligibility: function(){
 		try{
@@ -5,10 +12,9 @@ var iparcelMage = {
 		}catch(exception){}
 	},
 	ajax: {
-		post: function(sku, super_attribute, url) {
+		post: function(sku, super_attribute, url){
 			var $jip = jQuery.noConflict();
 			var data = super_attribute+'sku='+sku;
-            $jip('.iparcelsku').attr('finalsku', 'false');
 			$jip.ajax({
 				'url': url,
 				'data': data,
@@ -17,7 +23,6 @@ var iparcelMage = {
 				success: function(data){
 					if (data){
 						$jip('.iparcelsku').text(data.sku);
-                        $jip('.iparcelsku').attr('finalsku', 'true');
 
 						iparcelPost.setStock('true');
 
@@ -38,7 +43,7 @@ var iparcelMage = {
 		}
 	},
 	parseHtmlEntities: function(str){
-		return str.replace(/&#([0-9]{1,4});/gi,function(match,numStr){
+		return str.replace(/&#([0-9]{1,3});/gi,function(match,numStr){
 			var num = parseInt(numStr,10);
 			return String.fromCharCode(num);
 		});

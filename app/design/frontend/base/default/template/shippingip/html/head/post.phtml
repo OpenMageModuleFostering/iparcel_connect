@@ -2,10 +2,8 @@
 /**
  * @category	design
  * @package		Iparcel_Shipping
- * @author     Bobby Burden <bburden@i-parcel.com>
+ * @author		Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
  * @class			Iparcel_Shipping_Block_Html_Head_Post
  */
 ?>
-<?php foreach($this->getScript() as $script):?>
-    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS).$script; ?>"></script>
-<?php endforeach;?>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS).$this->getScript(); ?>"></script>

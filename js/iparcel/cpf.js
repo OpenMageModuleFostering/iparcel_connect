@@ -1,3 +1,10 @@
+/**
+ * i-parcel's CPF field processing script
+ *
+ * @category	Iparcel
+ * @package		Iparcel_Shipping
+ * @author		Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
+ */
 var iparcel = {
 	/**
 	 * Processing Shipping/Billing country changes

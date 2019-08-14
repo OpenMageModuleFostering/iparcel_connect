@@ -4,36 +4,35 @@
  *
  * @category   Iparcel
  * @package    Iparcel_Shipping
- * @author     Bobby Burden <bburden@i-parcel.com>
+ * @author     Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
  */
-class Iparcel_Shipping_Block_Adminhtml_Logs extends Mage_Adminhtml_Block_Widget_Grid_Container
-{
-    /**
-     * Initialize factory instance
-     */
-    public function __construct()
-    {
-        $this->_blockGroup = 'shippingip';
-        $this->_controller = 'adminhtml_logs';
-        $this->_headerText = $this->__('Logs');
+class Iparcel_Shipping_Block_Adminhtml_Logs extends Mage_Adminhtml_Block_Widget_Grid_Container{
+	/**
+	 * Initialize factory instance
+	 */
+	public function __construct(){
+		$this->_blockGroup = 'shippingip';
+		$this->_controller = 'adminhtml_logs';
+		$this->_headerText = $this->__('Logs');
 
-        parent::__construct();
-    }
+		parent::__construct();
+	}
 
-    /**
-     * Preparing child blocks for each added button ,removing add button, adding clear button
-     *
-     * @return Iparcel_Shipping_Block_Adminhtml_Logs
-     */
-    protected function _prepareLayout()
-    {
-        $this->_removeButton('add');
+	/**
+	 * Preparing child blocks for each added button ,removing add button, adding clear button
+	 *
+	 * @return Iparcel_Shipping_Block_Adminhtml_Logs 
+	 */
+	protected function _prepareLayout()
+	{
+		$this->_removeButton('add');
 
-        $this->_addButton('clear', array(
-            'label' => $this->__('Clear'),
-            'onclick' => 'setLocation(\''.$this->getUrl('*/*/clear').'\')'
-        ));
+		$this->_addButton('clear',array(
+			'label' => $this->__('Clear'),
+			'onclick' => 'setLocation(\''.$this->getUrl('*/*/clear').'\')'
+		));
 
-        return parent::_prepareLayout();
-    }
+		return parent::_prepareLayout();
+	}
 }
+?>

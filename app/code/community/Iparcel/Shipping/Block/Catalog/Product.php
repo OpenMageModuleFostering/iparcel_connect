@@ -4,18 +4,17 @@
  *
  * @category   Iparcel
  * @package    Iparcel_Shipping
- * @author     Bobby Burden <bburden@i-parcel.com>
+ * @author		 Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
  */
-class Iparcel_Shipping_Block_Catalog_Product extends Mage_Catalog_Block_Product_View
-{
-    /**
-     * Retrieve qty for product
-     *
-     * @param Mage_Catalog_Model_Product $product
-     * $return float
-     */
-    public function getStock()
-    {
-        return Mage::getModel('cataloginventory/stock_item')->loadByProduct($this->getProduct())->getQty();
-    }
+class Iparcel_Shipping_Block_Catalog_Product extends Mage_Catalog_Block_Product_View{
+	/**
+	 * Retrieve qty for product
+	 *
+	 * @param Mage_Catalog_Model_Product $product
+	 * $return float
+	 */ 
+	public function getStock(){
+		return Mage::getModel('cataloginventory/stock_item')->loadByProduct($this->getProduct())->getQty();
+	}
 }
+?>

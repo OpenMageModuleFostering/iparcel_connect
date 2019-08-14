@@ -2,23 +2,22 @@
 /**
  * @category	design
  * @package		Iparcel_Shipping
- * @author     Bobby Burden <bburden@i-parcel.com>
+ * @author		Patryk Grudniewski <patryk.grudniewski@sabiosystem.com>
  * @class			Iparcel_Shipping_Block_Catalog_Product_List
  */
 ?>
 <?php
 $_productCollection = $this->getLoadedProductCollection();
-$helper = Mage::helper('shippingip')
 ?>
 <script type="text/javascript">
 	iparcelPost.sku_list({
 		<?php foreach ($_productCollection as $_product): ?>
-		"<?php echo $helper->jsEscape($_product->getSku()); ?>": "<?php echo $helper->jsEscape($_product->getName()); ?>",
+		"<?php echo $_product->getSku(); ?>": "<?php echo $_product->getName(); ?>",
 		<?php endforeach; ?>
 	});
 	iparcelPost.stock_list({
 		<?php foreach ($_productCollection as $_product): ?>
-		"<?php echo $helper->jsEscape($_product->getName()); ?>": "<?php echo $this->getStock($_product); ?>",
+		"<?php echo $_product->getName(); ?>": "<?php echo $this->getStock($_product); ?>",
 		<?php endforeach; ?>
 	});
 </script>

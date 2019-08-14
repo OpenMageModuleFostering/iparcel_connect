@@ -2,12 +2,11 @@
 /**
  * Frontend Model Class for salesrules/upload/sync config button
  *
- * @category     Iparcel
+ * @category	 Iparcel 
  * @package    Iparcel_Shipping
- * @author     Bobby Burden <bburden@i-parcel.com>
+ * @author     Patryk Grudniewski <patryk.grudniewski@sabiosystem.com> 
  */
-class Iparcel_Shipping_Block_Adminhtml_Salesrule_Rule_Sync extends Mage_Adminhtml_Block_System_Config_Form_Field
-{
+class Iparcel_Shipping_Block_Adminhtml_Salesrule_Rule_Sync extends Mage_Adminhtml_Block_System_Config_Form_Field{
 
     /**
      * Get Button Html
@@ -15,9 +14,8 @@ class Iparcel_Shipping_Block_Adminhtml_Salesrule_Rule_Sync extends Mage_Adminhtm
      * @param Varien_Data_Form_Element_Abstract $element
      * @return string
      */
-    protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
-    {
-        $url = Mage::helper('adminhtml')->getUrl("adminhtml/shippingip_sync/salesrule");
+    protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element) {
+        $url = Mage::helper('adminhtml')->getUrl("shippingip/sync/salesrule");
         
         $html = $this->getLayout()->createBlock('adminhtml/widget_button')
                     ->setType('button')
@@ -28,4 +26,7 @@ class Iparcel_Shipping_Block_Adminhtml_Salesrule_Rule_Sync extends Mage_Adminhtm
 
         return $html;
     }
+    
+
+    
 }

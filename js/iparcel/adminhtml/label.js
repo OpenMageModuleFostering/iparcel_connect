@@ -1,3 +1,10 @@
+/**
+ * Label Printing script for i-parcel shipping
+ *
+ * @category	Iparcel
+ * @package		Iparcel_Shipping
+ * @author		Patryk Grudniewski
+ */
 var iparcel = {
 	xhr: function (url, obj, async, cfunc){
 		object=obj;

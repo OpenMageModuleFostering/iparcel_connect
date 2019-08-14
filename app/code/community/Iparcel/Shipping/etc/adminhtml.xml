@@ -38,7 +38,7 @@
 				<log>
 					<title>Logs</title>
 					<sort_order>20</sort_order>
-					<action>adminhtml/shippingip_log/index</action>
+					<action>shippingip/log/index</action>
 				</log>
 			</children>
 		</iparcel>

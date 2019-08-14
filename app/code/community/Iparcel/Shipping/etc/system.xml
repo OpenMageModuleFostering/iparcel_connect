@@ -26,23 +26,14 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</active>
-						<title>
-							<label>Title</label>
+						<whitelabelship>
+							<label>Name of Displayed Shipping Method (frontend)</label>
 							<frontend_type>text</frontend_type>
 							<sort_order>100</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
-						</title>
-						<name>
-							<label>Methods Names</label>
-							<frontend_model>shippingip/adminhtml_system_config_form_field_method</frontend_model>
-              <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
-							<sort_order>102</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</name>
+						</whitelabelship>
 						<whitelabelpay>
 							<label>Name of Displayed Payment Method</label>
 							<frontend_type>text</frontend_type>
@@ -51,6 +42,14 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</whitelabelpay>
+						<backend_name>
+							<label>Name of Displayed Shipping Method (backend)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>102</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</backend_name>
 						<autoship>
 							<label>Auto Generate Shipment</label>
 							<frontend_type>select</frontend_type>
@@ -145,7 +144,7 @@
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
 							<show_in_store>0</show_in_store>
-							<tooltip>This is the Company ID provided by i-parcel.</tooltip>
+							<tooltip>This is the Customer ID provided by i-parcel.</tooltip>
 						</custid>
 						<userid translate="label">
 							<label>Web Service Key (GUID)</label>
@@ -165,6 +164,15 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>0</show_in_store>
 						</submit_parcel>
+						<timeout translate="label,comment">
+							<label>Api Timeout</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>11</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>In seconds.</comment>
+						</timeout>
 					</fields>
 				</config>
 				<scripts translate="label">
