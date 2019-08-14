@@ -2,7 +2,7 @@
 <config>
 	<tabs>
 		<i-parcel translate="label" module="shippingip">
-			<label>i-parcel</label>
+		<label>i-parcel</label>
 			<sort_order>500</sort_order>
 		</i-parcel>
 	</tabs>
@@ -26,14 +26,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</active>
-						<whitelabelship>
-							<label>Name of Displayed Shipping Method (frontend)</label>
+						<title>
+							<label>Title</label>
 							<frontend_type>text</frontend_type>
 							<sort_order>100</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
-						</whitelabelship>
+						</title>
+						<name>
+							<label>Methods Names</label>
+							<frontend_model>shippingip/adminhtml_system_config_form_field_method</frontend_model>
+              <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+							<sort_order>102</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</name>
 						<whitelabelpay>
 							<label>Name of Displayed Payment Method</label>
 							<frontend_type>text</frontend_type>
@@ -42,14 +51,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</whitelabelpay>
-						<backend_name>
-							<label>Name of Displayed Shipping Method (backend)</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>102</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</backend_name>
 						<autoship>
 							<label>Auto Generate Shipment</label>
 							<frontend_type>select</frontend_type>
@@ -124,7 +125,7 @@
 			<label>Configuration</label>
 			<tab>i-parcel</tab>
 			<frontent_type>text</frontent_type>
-			<sort_order>0</sort_order>
+			<sort_order>100</sort_order>
 			<show_in_default>1</show_in_default>
 			<show_in_website>1</show_in_website>
 			<show_in_store>0</show_in_store>
@@ -144,7 +145,7 @@
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
 							<show_in_store>0</show_in_store>
-							<tooltip>This is the Customer ID provided by i-parcel.</tooltip>
+							<tooltip>This is the Company ID provided by i-parcel.</tooltip>
 						</custid>
 						<userid translate="label">
 							<label>Web Service Key (GUID)</label>
@@ -166,6 +167,44 @@
 						</submit_parcel>
 					</fields>
 				</config>
+				<scripts translate="label">
+					<label>Scripts</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>5</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<scripts translate="label">
+							<label>Enable Frontend Scripts</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>5</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</scripts>
+						<jquery translate="label">
+							<label>Enable jQuery</label>
+							<comment>Set it to "no" if you're using another jQuery library</comment>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</jquery>
+						<post translate="label">
+							<label>Custom POST scripts</label>
+							<frontend_type>file</frontend_type>							 
+							<backend_model>shippingip/config_script_js</backend_model>
+							<sort_order>15</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>							 
+							<show_in_store>1</show_in_store>						
+						</post>
+					</fields>
+				</scripts>
 				<international_customer translate="label">
 					<label>International Customer</label>
 					<frontend_type>text</frontend_type>
@@ -253,7 +292,7 @@
 			<label>Catalog Mapping</label>
 			<tab>i-parcel</tab>
 			<frontend_type>text</frontend_type>
-			<sort_order>5</sort_order>
+			<sort_order>110</sort_order>
 			<show_in_default>1</show_in_default>
 			<show_in_website>1</show_in_website>
 			<show_in_store>0</show_in_store>
@@ -499,7 +538,7 @@
 			<label>External API</label>
 			<tab>i-parcel</tab>
 			<frontend_type>text</frontend_type>
-			<sort_order>10</sort_order>
+			<sort_order>120</sort_order>
 			<show_in_default>1</show_in_default>
 			<show_in_website>0</show_in_website>
 			<show_in_store>0</show_in_store>
