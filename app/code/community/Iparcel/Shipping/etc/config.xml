@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Iparcel_Shipping>
-            <version>2.4.4</version>
+            <version>2.4.5</version>
         </Iparcel_Shipping>
     </modules>
     <crontab>
@@ -34,13 +34,13 @@
     </frontend>
     <admin>
         <routers>
-            <shippingip>
-                <use>admin</use>
+            <adminhtml>
                 <args>
-                    <module>Iparcel_Shipping_Adminhtml</module>
-                    <frontName>shippingip</frontName>
+                    <modules>
+                        <shippingip after="Mage_Adminhtml">Iparcel_Shipping_Adminhtml</shippingip>
+                    </modules>
                 </args>
-            </shippingip>
+            </adminhtml>
         </routers>
     </admin>
     <adminhtml>
