@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/iparcel_connect",
+    "type": "magento-module",
+    "license": "GPL",
+    "homepage": "",
+    "description": "Summary",
+    "authors": [
+    {
+        "name": "Patryk Grudniewski",
+        "email": "patryk.grudniewski@sabiocoders.com"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}

@@ -1,0 +1,46 @@
+<config>
+	<menu>
+		<iparcel translate="title" module="shippingip">
+			<title>i-parcel</title>
+			<sort_order>999</sort_order>
+			<children>
+				<config translate="title" module="shippingip">
+					<title>Configuration</title>
+					<sort_order>0</sort_order>
+					<action>adminhtml/system_config/edit/section/iparcel</action>
+				</config>
+				<sync translate="title" module="shippingip">
+					<title>Synchronization</title>
+					<sort_order>5</sort_order>
+					<children>
+						<catalog_mapping translate="title" module="shippingip">
+							<title>Catalog Mapping</title>
+							<sort_order>5</sort_order>
+							<action>adminhtml/system_config/edit/section/catalog_mapping</action>
+						</catalog_mapping>
+						<!--<salesrules translate="title" module="shippingip">-->
+							<!--<title>Sales Rules</title>-->
+							<!--<sort_order>10</sort_order>-->
+							<!--<action>adminhtml/system_config/edit/section/salesrules</action>-->
+						<!--</salesrules>-->
+					</children>
+				</sync>
+				<shipping translate="title" module="shippingip">
+					<title>Shipping Methods</title>
+					<sort_order>10</sort_order>
+					<action>adminhtml/system_config/edit/section/carriers</action>
+				</shipping>
+				<external_api translate="title" module="shippingip">
+					<title>External API</title>
+					<sort_order>15</sort_order>
+					<action>adminhtml/system_config/edit/section/external_api</action>
+				</external_api>
+				<log>
+					<title>Logs</title>
+					<sort_order>20</sort_order>
+					<action>shippingip/log/index</action>
+				</log>
+			</children>
+		</iparcel>
+	</menu>
+</config>
