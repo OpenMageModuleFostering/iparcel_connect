@@ -439,6 +439,15 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
             ),
         );
 
+        // Add comment for promo code
+        $promos = $this->getPromos();
+        if (count($promos) && !empty($promos[0])) {
+            $_orderData['order']['comment']['customer_note'] .= " Promo Codes used: "
+            . join(
+                ", ", $promos
+                );
+        }
+
         /**
          * Place the user in the "NOT LOGGED IN GROUP" if they are a guest,
          * and set the quote's first/lastname
@@ -477,6 +486,7 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         /* var $_orderCreator Mage_Adminhtml_Sales_Order_Create */
 
         $subtotal = 0;
+        $discount = $this->getDiscount();
 
         // processing order's items, setting prices, totals etc
         foreach ($this->getProducts() as $productData) {
@@ -510,7 +520,7 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         }
 
         // calc grand total
-        $grandtotal = $subtotal+$tax+$shippingCosts;
+        $grandtotal = $subtotal+$tax+$shippingCosts-$discount;
 
         // set currency
         if (!$this->getCurrency()) {
@@ -563,15 +573,28 @@ class Iparcel_GlobaleCommerce_Model_Api_External_Sales_Order extends Mage_Core_M
         $_order->setShippingDescription($ship->getMethodDescription());
         $_order->setBaseShippingAmount($ship->getPrice());
         $_order->setShippingAmount($ship->getPrice());
-        $_order->setGlobalCurrencyCode($currency);
-        $_order->setBaseCurrencyCode($currency);
-        $_order->setStoreCurrencyCode($currency);
         $_order->setOrderCurrencyCode($currency);
         $_order->setTaxAmount($tax);
         $_order->setBaseTaxAmount($tax);
-        $_order->setSubtotal($subtotal);
+        $_order->setSubtotal($subtotal - $this->getDiscount());
+        $_order->setBaseSubtotal($subtotal - $this->getDiscount());
         $_order->setGrandTotal($grandtotal);
+        $_order->setDiscountAmount($this->getDiscount());
         $_order->setBaseGrandTotal($grandtotal);
+
+        // Set conversion rates
+        $globalCurrencyCode  = Mage::app()->getBaseCurrencyCode();
+        $baseCurrency = Mage::app()->getStore()->getBaseCurrency();
+        $_order->setGlobalCurrencyCode($globalCurrencyCode);
+        $_order->setBaseCurrencyCode($baseCurrency->getCode());
+        $_order->setStoreCurrencyCode($baseCurrency->getCode());
+        $_order->setBaseToGlobalRate(
+            $baseCurrency->getRate($globalCurrencyCode)
+        );
+        $_order->setBaseToQuoteRate(
+            $baseCurrency->getRate($globalCurrencyCode)
+        );
+
         $_order->save();
         $_order->sendNewOrderEmail();
 

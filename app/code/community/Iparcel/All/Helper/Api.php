@@ -23,23 +23,29 @@ class Iparcel_All_Helper_Api
     /** @var string URL for the Quote endpoint */
     protected $_quote = 'https://webservices.i-parcel.com/api/Quote';
 
+    /** @var int Timeout in seconds for REST requests */
+    protected $_timeout = 15;
+
     /**
      * Send POST requests to the REST API
      *
      * @param string $post POST Data to send
      * @param string $url REST API URL to send POST data to
      * @param array $header Array of headers to attach to the request
+     * @param int $timeout Timeout in seconds
      * @return string Response from the POST request
      */
-    protected function _rest($post, $url, array $header)
+    protected function _rest($post, $url, array $header, $timeout = 0)
     {
         $curl = curl_init($url);
 
-        $timeout = 15;
-        if ($timeout) {
-            curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+        $throwExceptionOnTimeout = true;
+        if (!$timeout || !is_int($timeout) || $timeout == 0) {
+            $timeout = $this->_timeout;
+            $throwExceptionOnTimeout = false;
         }
 
+        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_POST, true);
@@ -48,6 +54,12 @@ class Iparcel_All_Helper_Api
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $response = curl_exec($curl);
+
+        if (curl_errno($curl) == 28 // CURLE_OPERATION_TIMEDOUT
+            && $throwExceptionOnTimeout
+        ) {
+            throw new Exception;
+        }
 
         curl_close($curl);
 
@@ -61,14 +73,16 @@ class Iparcel_All_Helper_Api
      *
      * @param string $json Data to be JSON encoded and sent to the API
      * @param string $url REST API URL to send POST data to
+     * @param int Timeout value in seconds
      * @return string Response from the POST request
      */
-    protected function _restJSON($json, $url)
+    protected function _restJSON($json, $url, $timeout = 0)
     {
         return $this->_rest(
             json_encode($json),
             $url,
-            array('Content-Type: text/json')
+            array('Content-Type: text/json'),
+            $timeout
         );
     }
 
@@ -86,7 +100,15 @@ class Iparcel_All_Helper_Api
         if ($attribute->getData()) {
             $code = $attribute->getAttributeCode();
         }
-        $val = strip_tags(($product->getData($code) && $product->getAttributeText($code)) ? $product->getAttributeText($code) : $product->getData($code));
+
+        // Special case for `special_price` code
+        if ($code == 'special_price') {
+            // Grabs the special price if we are in the applicable date range
+            $val = $product->getFinalPrice();
+        } else {
+            $val = strip_tags(($product->getData($code) && $product->getAttributeText($code)) ? $product->getAttributeText($code) : $product->getData($code));
+        }
+
         return $val;
     }
 
@@ -474,8 +496,6 @@ class Iparcel_All_Helper_Api
         $items = array();
         $items['key'] = Mage::helper('iparcel')->getGuid();
 
-        $skus = $items['SKUs'] = array();
-
         foreach ($products as $product) {
             /** @var Mage_Catalog_Model_Product $product */
             $product = Mage::getModel('catalog/product')->load($product->getId());
@@ -508,6 +528,21 @@ class Iparcel_All_Helper_Api
             }
 
             $price = null;
+
+            // Finds the price for simple products with configurable parents
+            $configurableParent = Mage::getModel('catalog/product_type_configurable')
+                ->getParentIdsByChild($product->getId());
+            if (count($configurableParent)) {
+                $configurableParent = Mage::getModel('catalog/product')->load(
+                    $configurableParent[0]
+                );
+
+                $price = $this->_getConfigurableProductPrice(
+                    $configurableParent,
+                    $product
+                );
+            }
+
             // if it's simple product and config is to get parent's price
             if ($product->getTypeId() == 'simple' && Mage::getStoreConfig('catalog_mapping/attributes/price_type') == Iparcel_All_Model_System_Config_Source_Catalog_Mapping_Configurable_Price::CONFIGURABLE) {
                 // get parentIds
@@ -518,7 +553,15 @@ class Iparcel_All_Helper_Api
             // if there's no price
             if (!$price) {
                 //get current product's price
-                $price = $this->_getProductAttribute($product, 'price');
+                if (is_null($price)) {
+                    $price = $this->_getProductAttribute($product, 'price');
+                }
+            }
+
+            // If all attempts to gather a price based on configuration fail,
+            // call getPrice() on the product
+            if (!$price) {
+                $price = $product->getPrice();
             }
 
             $item['CountryOfOrigin'] = (string)$product->getCountryOfManufacture();
@@ -856,6 +899,12 @@ class Iparcel_All_Helper_Api
             $itemPrice = (float)$this->_getProductAttribute($itemProduct, 'price');
         }
 
+        // If all attempts to gather a price based on configuration fail,
+        // call getPrice() on the product
+        if (!$itemPrice) {
+            $itemPrice = $itemProduct->getPrice();
+        }
+
         $lineItem = array();
         $lineItem['SKU'] = $item->getSku();
         $lineItem['ValueUSD'] = $itemPrice;
@@ -890,5 +939,55 @@ class Iparcel_All_Helper_Api
         }
 
         return true;
+    }
+
+    /**
+     * Find the price for a simple product based on the configurable
+     *
+     * @param $configurable
+     * @param $simple
+     * @return null|float
+     */
+    protected function _getConfigurableProductPrice($configurable, $simple)
+    {
+        $price = null;
+
+        $productAttributeOptions = $configurable->getTypeInstance(true)
+            ->getConfigurableAttributesAsArray($configurable);
+
+        $options = array();
+        // Builds the $options array to match the attribute configuration for
+        // this particular simple -> configurable relationship
+        foreach ($productAttributeOptions as $productAttribute) {
+            $allValues = array_column(
+                $productAttribute['values'],
+                'value_index'
+            );
+
+            $currentProductValue = $simple->getData(
+                $productAttribute['attribute_code']
+            );
+
+            if (in_array($currentProductValue, $allValues)) {
+                $options[$productAttribute['attribute_id']] = $currentProductValue;
+            }
+        }
+
+        if (!count($options)) {
+            return null;
+        }
+
+        $params = array(
+            'product' => $configurable->getId(),
+            'super_attribute' => $options,
+            'qty' => 1
+        );
+
+        $cart = Mage::getModel('checkout/cart')->init();
+        $cart->addProduct($configurable, new Varien_Object($params));
+
+        $cart->getQuote()->collectTotals();
+
+        return $cart->getQuote()->getSubtotal();
     }
 }

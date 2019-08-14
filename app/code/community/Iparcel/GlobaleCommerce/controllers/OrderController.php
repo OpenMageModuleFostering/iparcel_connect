@@ -113,9 +113,11 @@ class Iparcel_GlobaleCommerce_OrderController extends Mage_Core_Controller_Front
                 $orders = $this->_addCustomOptionsToOrder($orders);
             }
 
+            $model->setPromos($request->getPost('promo'));
             $model->setOrderData($orders);
             $model->setShippingCosts($shipping);
             $model->setTax($tax);
+            $model->setDiscount($request->getPost('discount'));
             // if tracking specified set tracking number
             if ($tracking !== null) {
                 $model->setTrackingNumber($tracking['number']);
